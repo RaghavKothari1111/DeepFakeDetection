@@ -6,7 +6,17 @@ __pycache__/
 *.pack.gz
 .cache/
 
-# Your project’s heavy outputs
+# Your project's heavy outputs
 backend/data/heatmaps/
 data/heatmaps/
 data/uploads/
+
+# Model files (too large for git)
+*.keras
+*.h5
+*.pt
+*.pth
+*.pkl
+*.pb
+*.onnx
+*.tflite
