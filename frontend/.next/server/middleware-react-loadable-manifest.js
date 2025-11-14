@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"index.tsx -> @/components/Navbar\":{\"id\":\"index.tsx -> @/components/Navbar\",\"files\":[\"static/chunks/src_components_Navbar_tsx.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST="{\"[id].tsx -> @/components/Navbar\":{\"id\":\"[id].tsx -> @/components/Navbar\",\"files\":[\"static/chunks/src_components_Navbar_tsx-_25530.js\"]},\"index.tsx -> @/components/Navbar\":{\"id\":\"index.tsx -> @/components/Navbar\",\"files\":[\"static/chunks/src_components_Navbar_tsx-_25531.js\"]}}"
