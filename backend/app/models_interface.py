@@ -77,10 +77,8 @@ os.makedirs(HEATMAP_DIR, exist_ok=True)
 # You can replace the `path` with an absolute path if you prefer.
 # -----------------------
 MODEL_REGISTRY: List[Dict[str, Any]] = [
-    # Working models that exist
-    {"name": "Model2_Keras", "path": "model2.keras", "framework": "keras", "input_size": 150, "version": "1.0"},
-    
-    # New models created from Keras pre-trained models
+    # Models created from Keras pre-trained models
+    {"name": "MobileNetV2_Deepfake", "path": "mobilenetv2_deepfake.h5", "framework": "keras", "input_size": 224, "version": "1.0"},
     {"name": "EfficientNetB0_Deepfake", "path": "efficientnet_b0_deepfake.h5", "framework": "keras", "input_size": 224, "version": "1.0"},
     {"name": "Xception_Deepfake", "path": "xception_deepfake.h5", "framework": "keras", "input_size": 299, "version": "1.0"},
     {"name": "ResNet50_Deepfake", "path": "resnet50_deepfake.h5", "framework": "keras", "input_size": 224, "version": "1.0"},
@@ -88,6 +86,7 @@ MODEL_REGISTRY: List[Dict[str, Any]] = [
     # Models that need special handling (currently not working)
     # {"name": "XceptionFake", "path": "deepfake_detection_xception_180k_14epochs.h5", "framework": "keras", "input_size": 299, "version": "1.0", "load_with_legacy": True},
     # Note: XceptionModel.keras and InceptionV3Model.keras have architecture issues (Flatten layer receiving list)
+    # Note: model2.keras has been replaced with MobileNetV2_Deepfake
     # They are excluded from the registry until fixed
 ]
 

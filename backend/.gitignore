@@ -1,4 +1,12 @@
-node_modules
-.env
-.env.local
-__pycache__
+__pycache__/
+*.pyc
+
+# Next.js
+.next/
+*.pack.gz
+.cache/
+
+# Your project’s heavy outputs
+backend/data/heatmaps/
+data/heatmaps/
+data/uploads/

@@ -16,5 +16,11 @@
     "files": [
       "static/chunks/src_components_Navbar_tsx-_25532.js"
     ]
+  },
+  "indexloggedin.tsx -> @/components/Navbar": {
+    "id": "indexloggedin.tsx -> @/components/Navbar",
+    "files": [
+      "static/chunks/src_components_Navbar_tsx-_25532.js"
+    ]
   }
 }
