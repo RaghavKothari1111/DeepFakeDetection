@@ -27,6 +27,8 @@ export interface JobResponse {
 
 export interface DashboardJob {
   job_id: string;
+  analysis_number?: number;
+  display_name?: string;
   thumbnail_url?: string;
   created_at: string;
   consensus?: {

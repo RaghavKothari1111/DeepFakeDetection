@@ -7,6 +7,8 @@ from fastapi import (
     BackgroundTasks,
     HTTPException,
 )
+import asyncio
+import threading
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -36,6 +38,13 @@ from .schemas_auth import UserCreate, UserResponse, Token, LoginRequest
 
 from .support import router as support_router
 from .payments import router as payments_router
+
+# Initialize models at startup
+try:
+    from .models_interface import initialize_models
+    initialize_models()
+except Exception as e:
+    print(f"Warning: Could not initialize models: {e}")
 
 
 # -------------------------------------
@@ -159,12 +168,36 @@ async def upload_image(
         # Prefer Celery if available
         if celery:
             try:
+                print(f"[main] Using Celery for job_id={job.id}")
                 run_analysis.delay(job.id, save_path)
-            except Exception:
-                background_tasks.add_task(run_analysis_sync, job.id, save_path)
+            except Exception as e:
+                print(f"[main] Celery failed, falling back to threading: {e}")
+                # Run in background thread
+                def run_task():
+                    try:
+                        run_analysis_sync(job.id, save_path)
+                    except Exception as err:
+                        print(f"[main] Background task error for job {job.id}: {err}")
+                        import traceback
+                        traceback.print_exc()
+                
+                thread = threading.Thread(target=run_task, daemon=False)  # Not daemon
+                thread.start()
         else:
-            background_tasks.add_task(run_analysis_sync, job.id, save_path)
+            print(f"[main] Using background thread for job_id={job.id}")
+            # Run in background thread - NOT daemon so it completes
+            def run_task():
+                try:
+                    run_analysis_sync(job.id, save_path)
+                except Exception as e:
+                    print(f"[main] Background task error for job {job.id}: {e}")
+                    import traceback
+                    traceback.print_exc()
+            
+            thread = threading.Thread(target=run_task, daemon=False)  # Not daemon - ensures completion
+            thread.start()
 
+        print(f"[main] Job {job.id} created, analysis task scheduled in thread")
         return {"jobId": job.id}
 
     except Exception as e:
@@ -218,9 +251,12 @@ def transform_job_for_frontend(job):
             )
 
             heatmap_url = None
-            if result.heatmap_path and os.path.exists(result.heatmap_path):
-                fname = os.path.basename(result.heatmap_path)
-                heatmap_url = f"http://localhost:8000/api/heatmaps/{fname}"
+            if result.heatmap_path and result.heatmap_path != "N/A":
+                # heatmap_path might be just filename or full path
+                fname = os.path.basename(result.heatmap_path) if os.path.sep in result.heatmap_path else result.heatmap_path
+                heatmap_file_path = os.path.join(HEATMAP_DIR, fname)
+                if os.path.exists(heatmap_file_path):
+                    heatmap_url = f"http://localhost:8000/api/heatmaps/{fname}"
 
             img_url = None
             if job.file_path and os.path.exists(job.file_path):
@@ -281,7 +317,23 @@ def get_job(job_id: int, db: Session = Depends(get_db)):
 @app.get("/dashboard")
 def dashboard(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     jobs = crud.get_recent_jobs(db, user_id=current_user.id)
-    return [transform_job_for_frontend(job) for job in jobs]
+    
+    # Get total count of user's jobs to calculate analysis numbers
+    from . import models
+    total_count = db.query(models.Job).filter(models.Job.user_id == current_user.id).count()
+    
+    # Transform jobs and add user-specific analysis number
+    transformed = []
+    for idx, job in enumerate(jobs):
+        job_data = transform_job_for_frontend(job)
+        # Calculate analysis number (most recent = highest number)
+        # Since jobs are ordered by created_at DESC, first job is the latest
+        analysis_number = total_count - idx
+        job_data["analysis_number"] = analysis_number
+        job_data["display_name"] = f"Analysis #{analysis_number}"
+        transformed.append(job_data)
+    
+    return transformed
 
 
 # =================================================================
@@ -302,6 +354,117 @@ def get_heatmap_file(filename: str):
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Heatmap not found")
     return FileResponse(file_path)
+
+
+# =================================================================
+# TEST/DEBUG ENDPOINTS
+# =================================================================
+@app.post("/api/jobs/{job_id}/rerun")
+@app.post("/api/rerun/{job_id}")
+async def rerun_analysis(
+    job_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """Re-run analysis for an existing job"""
+    job = crud.get_job(job_id, db)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Check if user owns this job (allow if no user_id or user matches)
+    if job.user_id is not None and job.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to re-run this job")
+    
+    if not job.file_path or not os.path.exists(job.file_path):
+        raise HTTPException(status_code=404, detail="Image file not found")
+    
+    # Delete existing results
+    deleted_count = crud.delete_job_results(job_id, db)
+    print(f"[main] Deleted {deleted_count} existing results for job {job_id}")
+    
+    # Reset job status to pending (this will trigger frontend refresh)
+    crud.update_job_status(job_id, "pending", db)
+    db.commit()  # Ensure status is committed before returning
+    
+    # Run analysis in background
+    import threading
+    
+    def run_task():
+        try:
+            print(f"[main] Starting background re-analysis for job {job_id}")
+            run_analysis_sync(job_id, job.file_path)
+            print(f"[main] Completed re-analysis for job {job_id}")
+        except Exception as e:
+            print(f"[main] Re-run analysis error for job {job_id}: {e}")
+            import traceback
+            traceback.print_exc()
+            # Mark job as failed
+            try:
+                from .database import SessionLocal
+                db_retry = SessionLocal()
+                crud.update_job_status(job_id, "failed", db_retry)
+                db_retry.commit()
+                db_retry.close()
+            except Exception as db_err:
+                print(f"[main] Error updating job status to failed: {db_err}")
+    
+    thread = threading.Thread(target=run_task, daemon=False)
+    thread.start()
+    
+    # Return updated job status
+    db.refresh(job)
+    return {
+        "message": f"Re-analysis started for job {job_id}", 
+        "job_id": job_id,
+        "status": job.status
+    }
+
+
+@app.post("/api/test/analyze/{job_id}")
+async def test_analyze(job_id: int, db: Session = Depends(get_db)):
+    """Test endpoint to manually trigger analysis for a job"""
+    job = crud.get_job(job_id, db)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    if not job.file_path or not os.path.exists(job.file_path):
+        raise HTTPException(status_code=404, detail="Image file not found")
+    
+    # Run analysis synchronously for testing
+    try:
+        run_analysis_sync(job_id, job.file_path)
+        return {"message": f"Analysis completed for job {job_id}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+
+@app.get("/api/debug/job/{job_id}")
+def debug_job(job_id: int, db: Session = Depends(get_db)):
+    """Debug endpoint to check job status and results"""
+    job = crud.get_job(job_id, db)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    results_count = len(job.results) if job.results else 0
+    results_detail = []
+    if job.results:
+        for r in job.results:
+            results_detail.append({
+                "model_name": r.model_name,
+                "label": r.label,
+                "confidence_real": r.confidence_real,
+                "confidence_fake": r.confidence_fake,
+            })
+    
+    return {
+        "job_id": job.id,
+        "status": job.status,
+        "file_path": job.file_path,
+        "file_exists": os.path.exists(job.file_path) if job.file_path else False,
+        "results_count": results_count,
+        "results": results_detail,
+        "created_at": job.created_at.isoformat() if job.created_at else None,
+    }
 
 
 app.include_router(support_router)

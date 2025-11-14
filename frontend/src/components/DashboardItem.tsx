@@ -10,6 +10,8 @@ import React from "react";
 interface DashboardItemProps {
   item: {
     job_id: string;
+    analysis_number?: number;
+    display_name?: string;
     // thumbnail removed intentionally
     created_at?: string | number | null;
     consensus?: {
@@ -80,7 +82,7 @@ export default function DashboardItem({ item }: DashboardItemProps) {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h3 className="font-medium truncate" data-testid="text-job-filename">
-                {item.job_id}
+                {item.display_name || `Analysis #${item.analysis_number || item.job_id}`}
               </h3>
 
               <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">

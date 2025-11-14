@@ -4,6 +4,7 @@ import asyncio
 import os
 from .database import SessionLocal
 from . import crud
+from . import models
 from .config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND, USE_CELERY
 from .models_interface import run_models_on_image  # must return {"models": [...], "consensus": {...}}
 from datetime import datetime
@@ -61,6 +62,7 @@ def run_analysis_sync(job_id: int, file_path: str):
         print(f"[tasks] Starting analysis job_id={job_id}, file={file_path}")
         # 1) mark job processing
         crud.update_job_status(job_id, "processing", db)
+        db.commit()  # Ensure status is saved
 
         # 2) run the model pipeline (models_interface returns structured results)
         try:
@@ -69,26 +71,66 @@ def run_analysis_sync(job_id: int, file_path: str):
         except TypeError:
             # fallback if run_models_on_image signature is (file_path,) not (file_path, job_id)
             results = asyncio.run(run_models_on_image(file_path))
+        except Exception as e:
+            print(f"[tasks] Error running models: {e}")
+            traceback.print_exc()
+            raise
 
-        if not results or "models" not in results:
-            raise RuntimeError("Model runner returned unexpected result")
+        if not results:
+            raise RuntimeError("Model runner returned None")
+        
+        if "models" not in results:
+            raise RuntimeError("Model runner returned unexpected result structure")
 
         # 3) persist per-model results
-        for m in results["models"]:
-            # expect m contains keys: name, version, confidence_real, confidence_fake, label, time_ms, heatmap_path
-            crud.add_model_result(
-                job_id=job_id,
-                model_name=m.get("name") or m.get("model_name") or "unknown",
-                confidence_real=float(m.get("confidence_real", m.get("confidence", 0.0))),
-                confidence_fake=float(m.get("confidence_fake", 1.0 - float(m.get("confidence", 0.0)))),
-                label=m.get("label", "unknown"),
-                heatmap_path=m.get("heatmap_path", "N/A"),
-                db=db,
-            )
+        model_count = 0
+        print(f"[tasks] Processing {len(results.get('models', []))} model results")
+        if results.get("models"):
+            for m in results["models"]:
+                # expect m contains keys: name, version, confidence_real, confidence_fake, label, time_ms, heatmap_path
+                try:
+                    # Skip error results
+                    if m.get("label") == "error":
+                        print(f"[tasks] Skipping error result from model: {m.get('name', 'unknown')}")
+                        continue
+                    
+                    model_name = m.get("name") or m.get("model_name") or "unknown"
+                    confidence_real = float(m.get("confidence_real", 0.0))
+                    confidence_fake = float(m.get("confidence_fake", 0.0))
+                    label = m.get("label", "unknown")
+                    heatmap_path = m.get("heatmap_path", "N/A")
+                    
+                    print(f"[tasks] Saving result: model={model_name}, real={confidence_real:.4f}, fake={confidence_fake:.4f}, label={label}")
+                    
+                    crud.add_model_result(
+                        job_id=job_id,
+                        model_name=model_name,
+                        confidence_real=confidence_real,
+                        confidence_fake=confidence_fake,
+                        label=label,
+                        heatmap_path=heatmap_path,
+                        db=db,
+                    )
+                    model_count += 1
+                    print(f"[tasks] ✓ Saved result for model: {model_name}")
+                except Exception as e:
+                    print(f"[tasks] ✗ Error saving model result: {e}")
+                    traceback.print_exc()
+        
+        if model_count == 0:
+            print(f"[tasks] ⚠ Warning: No successful model results for job_id={job_id}")
+            print(f"[tasks] Results structure: {results}")
+        else:
+            print(f"[tasks] ✓ Successfully saved {model_count} model results")
 
-        # 4) mark job completed
+        # 4) mark job completed (even if no models worked)
         crud.update_job_status(job_id, "completed", db)
-        print(f"[tasks] Completed job_id={job_id}")
+        db.commit()
+        
+        # Verify results were saved
+        db.refresh(db.query(models.Job).filter(models.Job.id == job_id).first())
+        saved_results = db.query(models.ModelResult).filter(models.ModelResult.job_id == job_id).count()
+        print(f"[tasks] ✓ Completed job_id={job_id} with {model_count} model results (verified: {saved_results} in DB)")
 
     except Exception as e:
         # log and mark failed
@@ -96,8 +138,9 @@ def run_analysis_sync(job_id: int, file_path: str):
         traceback.print_exc()
         try:
             crud.update_job_status(job_id, "failed", db)
-        except Exception:
-            pass
+            db.commit()
+        except Exception as db_error:
+            print(f"[tasks] Error updating job status to failed: {db_error}")
     finally:
         db.close()
 

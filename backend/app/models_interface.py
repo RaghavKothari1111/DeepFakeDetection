@@ -67,7 +67,9 @@ APP_MODELS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "models
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.makedirs(os.path.dirname(BASE_DIR), exist_ok=True)  # ensure parent exists
 
-HEATMAP_DIR = os.path.abspath(os.path.join(BASE_DIR, "data", "heatmaps"))
+# Use same HEATMAP_DIR as main.py to ensure consistency
+# main.py uses: backend_dir/../data/heatmaps = DeepFake-Detector/data/heatmaps
+HEATMAP_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, "data", "heatmaps"))
 os.makedirs(HEATMAP_DIR, exist_ok=True)
 
 # -----------------------
@@ -75,11 +77,18 @@ os.makedirs(HEATMAP_DIR, exist_ok=True)
 # You can replace the `path` with an absolute path if you prefer.
 # -----------------------
 MODEL_REGISTRY: List[Dict[str, Any]] = [
-    {"name": "BestModelPT", "path": "best_model-v3.pt", "framework": "torch", "input_size": 224, "version": "1.0"},
-    {"name": "AI_CNN", "path": "ai_detector_cnn.h5", "framework": "keras", "input_size": 224, "version": "1.0"},
-    {"name": "XceptionFake", "path": "deepfake_detection_xception_180k_14epochs.h5", "framework": "keras", "input_size": 299, "version": "1.0"},
-    {"name": "DenseNet121", "path": "DenseNet121Model.keras", "framework": "keras", "input_size": 224, "version": "1.0"},
-    {"name": "Model2_Keras", "path": "model2.keras", "framework": "keras", "input_size": 224, "version": "1.0"},
+    # Working models that exist
+    {"name": "Model2_Keras", "path": "model2.keras", "framework": "keras", "input_size": 150, "version": "1.0"},
+    
+    # New models created from Keras pre-trained models
+    {"name": "EfficientNetB0_Deepfake", "path": "efficientnet_b0_deepfake.h5", "framework": "keras", "input_size": 224, "version": "1.0"},
+    {"name": "Xception_Deepfake", "path": "xception_deepfake.h5", "framework": "keras", "input_size": 299, "version": "1.0"},
+    {"name": "ResNet50_Deepfake", "path": "resnet50_deepfake.h5", "framework": "keras", "input_size": 224, "version": "1.0"},
+    
+    # Models that need special handling (currently not working)
+    # {"name": "XceptionFake", "path": "deepfake_detection_xception_180k_14epochs.h5", "framework": "keras", "input_size": 299, "version": "1.0", "load_with_legacy": True},
+    # Note: XceptionModel.keras and InceptionV3Model.keras have architecture issues (Flatten layer receiving list)
+    # They are excluded from the registry until fixed
 ]
 
 # Lightweight cache to avoid reload
@@ -106,15 +115,193 @@ def _load_torch_model(path: str):
         # else maybe it's state_dict: user must provide custom loader
         raise RuntimeError("Loaded object is not a nn.Module. Provide a custom loader for state_dict-based files.")
 
-def _load_keras_model(path: str):
+def _load_keras_model(path: str, use_legacy: bool = False):
+    """
+    Load Keras model with various compatibility options.
+    
+    Args:
+        path: Path to model file
+        use_legacy: If True, try legacy loading methods for old models
+    """
     if not TF_AVAILABLE:
         raise RuntimeError("TensorFlow not available. Install tensorflow to load .h5/.keras models.")
-    # Use tf.keras.models.load_model which supports .h5 and saved models
+    
+    # Try multiple loading strategies
+    strategies = []
+    
+    # Strategy 1: Standard load with Flatten fix
+    def load_standard():
+        try:
+            return tf.keras.models.load_model(path, compile=False)
+        except Exception as e:
+            error_str = str(e).lower()
+            # If error is about Flatten layer receiving list, try to fix it
+            if "flatten" in error_str and "list" in error_str and "shape" in error_str:
+                # Try loading with custom objects to fix Flatten layer
+                from tensorflow.keras.layers import Flatten, Layer
+                
+                class FixedFlatten(Flatten):
+                    """Flatten layer that handles list inputs"""
+                    def call(self, inputs):
+                        # Ensure inputs is a tensor, not a list
+                        if isinstance(inputs, (list, tuple)):
+                            # Take first element if it's a list
+                            if len(inputs) > 0:
+                                inputs = inputs[0]
+                            else:
+                                raise ValueError("Empty input list to Flatten layer")
+                        # Convert to tensor if needed
+                        if not hasattr(inputs, 'shape'):
+                            inputs = tf.convert_to_tensor(inputs)
+                        return super().call(inputs)
+                
+                # Also try with Lambda layer wrapper
+                class ListToTensor(Layer):
+                    """Layer that converts list inputs to tensor"""
+                    def call(self, inputs):
+                        if isinstance(inputs, (list, tuple)):
+                            return inputs[0] if len(inputs) > 0 else inputs
+                        return inputs
+                
+                custom_objects = {
+                    'Flatten': FixedFlatten,
+                    'ListToTensor': ListToTensor,
+                }
+                try:
+                    return tf.keras.models.load_model(path, compile=False, custom_objects=custom_objects)
+                except Exception as e2:
+                    # If that also fails, try to load and rebuild the model
+                    print(f"[models_interface] Standard load failed, trying architecture fix: {e2}")
+                    # Try loading weights only approach
+                    raise e2
+            raise
+    
+    strategies.append(load_standard)
+    
+    # Strategy 2: With safe_mode (for newer Keras versions)
     try:
-        model = tf.keras.models.load_model(path, compile=False)
-        return model
-    except Exception as e:
-        raise RuntimeError(f"Failed to load Keras model at {path}: {e}")
+        # Check if safe_mode parameter exists (newer Keras)
+        strategies.append(lambda: tf.keras.models.load_model(path, compile=False, safe_mode=False))
+    except TypeError:
+        # safe_mode doesn't exist in this version, skip
+        pass
+    
+    # Strategy 2b: Try SavedModel format (for .keras files that are SavedModel)
+    # Note: This is handled by the standard load_model, but we can add custom handling if needed
+    
+    # Strategy 3: Try loading weights only (for models with dtype issues)
+    if use_legacy:
+        def load_weights_only():
+            # For models with dtype tuple issues, try to load architecture and weights separately
+            try:
+                import h5py
+                import json
+                
+                with h5py.File(path, 'r') as f:
+                    # Try to get model config from attributes (not keys)
+                    if 'model_config' in f.attrs:
+                        config_str = f.attrs['model_config']
+                        if isinstance(config_str, bytes):
+                            config_str = config_str.decode('utf-8')
+                        elif not isinstance(config_str, str):
+                            config_str = str(config_str)
+                        
+                        try:
+                            config = json.loads(config_str)
+                        except json.JSONDecodeError:
+                            # Try to fix common JSON issues
+                            config_str = config_str.replace("'", '"')
+                            config = json.loads(config_str)
+                        
+                        # Fix dtype tuple issues recursively
+                        def fix_dtype_recursive(obj):
+                            if isinstance(obj, dict):
+                                fixed = {}
+                                for k, v in obj.items():
+                                    if k == 'dtype':
+                                        # Handle tuple/list dtype
+                                        if isinstance(v, (list, tuple)):
+                                            if len(v) == 2 and v[0] == 'dtype':
+                                                fixed[k] = 'float32'  # Default
+                                            elif len(v) > 0:
+                                                # Take first element if it's a string
+                                                fixed[k] = str(v[0]) if isinstance(v[0], str) else 'float32'
+                                            else:
+                                                fixed[k] = 'float32'
+                                        elif isinstance(v, str):
+                                            fixed[k] = v
+                                        else:
+                                            fixed[k] = 'float32'
+                                    else:
+                                        fixed[k] = fix_dtype_recursive(v)
+                                return fixed
+                            elif isinstance(obj, list):
+                                return [fix_dtype_recursive(item) for item in obj]
+                            elif isinstance(obj, tuple):
+                                # Check if it's a dtype tuple
+                                if len(obj) == 2 and obj[0] == 'dtype':
+                                    return 'float32'
+                                # Otherwise convert to list and fix
+                                return fix_dtype_recursive(list(obj))
+                            return obj
+                        
+                        config = fix_dtype_recursive(config)
+                        
+                        # Reconstruct model from fixed config
+                        try:
+                            model = tf.keras.models.model_from_json(json.dumps(config))
+                        except Exception as e1:
+                            # Try with model_from_config if available
+                            try:
+                                from tensorflow.keras.utils import model_from_config
+                                model = model_from_config(config)
+                            except:
+                                raise e1
+                        
+                        # Load weights
+                        try:
+                            model.load_weights(path, by_name=True, skip_mismatch=True)
+                        except Exception:
+                            # Try without skip_mismatch
+                            model.load_weights(path, by_name=True)
+                        return model
+                    else:
+                        raise ValueError("No model_config found in h5 file attributes")
+            except Exception as e:
+                # If this approach fails, re-raise to try next strategy
+                raise e
+        strategies.append(load_weights_only)
+    
+    # Strategy 4: Try with legacy format
+    if use_legacy:
+        strategies.append(lambda: tf.keras.models.load_model(path, compile=False, custom_objects=None))
+    
+    # Try each strategy
+    last_error = None
+    for i, strategy in enumerate(strategies):
+        try:
+            model = strategy()
+            if i > 0:
+                print(f"[models_interface] Loaded model using strategy {i+1}")
+            return model
+        except Exception as e:
+            last_error = e
+            if i == len(strategies) - 1:
+                # Last strategy failed, raise error
+                error_msg = str(last_error)
+                if "SavedModel" in error_msg or "saved_model" in error_msg.lower():
+                    raise RuntimeError(f"Failed to load Keras model at {path}: {error_msg}. This might be a SavedModel format issue.")
+                elif "h5" in path.lower() and "HDF5" in error_msg:
+                    raise RuntimeError(f"Failed to load Keras model at {path}: {error_msg}. The .h5 file might be corrupted or incompatible.")
+                elif "dtype" in error_msg.lower() and "tuple" in error_msg.lower():
+                    raise RuntimeError(f"Failed to load Keras model at {path}: {error_msg}. This model was saved with an older Keras version and has compatibility issues. Try converting it to a newer format.")
+                else:
+                    raise RuntimeError(f"Failed to load Keras model at {path}: {error_msg}")
+            # Continue to next strategy
+            continue
+    
+    # Should not reach here, but just in case
+    raise RuntimeError(f"Failed to load Keras model at {path}: All loading strategies failed")
 
 def _load_model_entry(entry: Dict[str, Any]):
     """
@@ -126,6 +313,15 @@ def _load_model_entry(entry: Dict[str, Any]):
     raw_path = entry.get("path")
     if not raw_path:
         raise RuntimeError(f"Model entry for '{name}' missing 'path'")
+    
+    # Validate input_size is specified
+    input_size = entry.get("input_size")
+    if input_size is None:
+        print(f"[models_interface] Warning: Model '{name}' missing input_size, defaulting to 224")
+        entry["input_size"] = 224
+    elif not isinstance(input_size, int) or input_size < 32:
+        print(f"[models_interface] Warning: Model '{name}' has invalid input_size={input_size}, defaulting to 224")
+        entry["input_size"] = 224
 
     # Build candidate paths to try (in order)
     candidates = []
@@ -188,18 +384,23 @@ def _load_model_entry(entry: Dict[str, Any]):
         model = loader(path, DEVICE)
     else:
         try:
+            # Check if model needs legacy loading
+            use_legacy = entry.get("load_with_legacy", False)
+            
             if framework in ("pt", "pth", "torch", "torchscript"):
                 model = _load_torch_model(path)
             elif framework in ("h5", "keras", "tf", "tfkeras"):
-                model = _load_keras_model(path)
+                model = _load_keras_model(path, use_legacy=use_legacy)
             else:
                 # fallback: try torch then keras
                 try:
                     model = _load_torch_model(path)
                 except Exception:
-                    model = _load_keras_model(path)
+                    model = _load_keras_model(path, use_legacy=use_legacy)
         except Exception as e:
-            raise RuntimeError(f"Failed to load model '{name}' at {path}: {e}")
+            error_msg = str(e)
+            framework_str = framework or "unknown"
+            raise RuntimeError(f"Failed to load {framework_str} model '{name}' at {path}: {error_msg}")
 
     with _MODEL_CACHE_LOCK:
         _MODEL_CACHE[cache_key] = model
@@ -209,33 +410,70 @@ def _load_model_entry(entry: Dict[str, Any]):
 # Preprocessing helpers
 # -----------------------
 def _preprocess_for_torch(img_pil: Image.Image, input_size: int):
-    # resize & center-crop to input_size, normalize w/ ImageNet mean/std
-    img = ImageOps.fit(img_pil.convert("RGB"), (input_size, input_size), Image.LANCZOS)
-    arr = np.array(img).astype(np.float32) / 255.0  # HWC
+    """
+    Preprocess image for PyTorch models.
+    Ensures image is resized to input_size before processing.
+    """
+    # Ensure image is RGB and properly sized
+    if img_pil.mode != "RGB":
+        img_pil = img_pil.convert("RGB")
+    
+    # Resize to exact input_size using high-quality resampling
+    img_resized = ImageOps.fit(img_pil, (input_size, input_size), Image.LANCZOS)
+    
+    # Convert to array and normalize
+    arr = np.array(img_resized).astype(np.float32) / 255.0  # HWC, [0, 1]
     arr = np.transpose(arr, (2,0,1))  # CHW
+    
+    # Convert to tensor
     tensor = torch.tensor(arr, dtype=torch.float32, device=DEVICE).unsqueeze(0)
+    
+    # ImageNet normalization
     mean = torch.tensor([0.485,0.456,0.406], device=DEVICE).view(1,3,1,1)
     std = torch.tensor([0.229,0.224,0.225], device=DEVICE).view(1,3,1,1)
     tensor = (tensor - mean) / std
+    
     return tensor
 
 def _preprocess_for_keras(img_pil: Image.Image, input_size: int):
-    img = ImageOps.fit(img_pil.convert("RGB"), (input_size, input_size), Image.LANCZOS)
-    arr = np.array(img).astype(np.float32)
+    """
+    Preprocess image for Keras/TensorFlow models.
+    Ensures image is resized to input_size before processing.
+    """
+    # Ensure image is RGB and properly sized
+    if img_pil.mode != "RGB":
+        img_pil = img_pil.convert("RGB")
+    
+    # Resize to exact input_size using high-quality resampling
+    img_resized = ImageOps.fit(img_pil, (input_size, input_size), Image.LANCZOS)
+    
+    # Convert to array and normalize to [0, 1]
+    arr = np.array(img_resized).astype(np.float32)
     arr = arr / 255.0
+    
+    # Add batch dimension
     inp = np.expand_dims(arr, axis=0)
+    
     return inp
 
 # -----------------------
 # Forward/predict helpers
 # -----------------------
 def _predict_with_torch(model, input_tensor):
+    """
+    Predict with PyTorch model and return normalized probabilities.
+    Handles various output formats: logits, probabilities, single values.
+    """
     model.eval()
     with torch.no_grad():
         out = model(input_tensor)
+        
+        # Extract prediction from dict if needed
         if isinstance(out, dict):
             if "logits" in out:
                 pred = out["logits"]
+            elif "probabilities" in out:
+                pred = out["probabilities"]
             else:
                 tensors = [v for v in out.values() if torch.is_tensor(v)]
                 pred = tensors[0] if tensors else out
@@ -248,43 +486,261 @@ def _predict_with_torch(model, input_tensor):
         if not torch.is_tensor(pred):
             raise RuntimeError("Torch model did not return tensor-like output")
 
-        if pred.dim() == 2 and pred.size(0) == 1:
-            probs = torch.softmax(pred, dim=1).cpu().numpy()[0]
-        elif pred.dim() == 1:
-            probs = torch.softmax(pred.unsqueeze(0), dim=1).cpu().numpy()[0]
+        # Handle different output shapes
+        pred = pred.squeeze()  # Remove extra dimensions
+        
+        # If single value (binary classification with sigmoid)
+        if pred.dim() == 0 or (pred.dim() == 1 and pred.size(0) == 1):
+            # Single value: apply sigmoid to get probability
+            prob_fake = torch.sigmoid(pred).cpu().item() if pred.dim() == 0 else torch.sigmoid(pred[0]).cpu().item()
+            prob_real = 1.0 - prob_fake
+            probs = np.array([prob_real, prob_fake], dtype=np.float32)
+        # If two values (binary classification with logits)
+        elif pred.dim() == 1 and pred.size(0) == 2:
+            # Two logits: apply softmax
+            probs = torch.softmax(pred, dim=0).cpu().numpy()
+        # If 2D with batch dimension
+        elif pred.dim() == 2:
+            if pred.size(1) == 1:
+                # Single output per sample: apply sigmoid
+                prob_fake = torch.sigmoid(pred[0, 0]).cpu().item()
+                prob_real = 1.0 - prob_fake
+                probs = np.array([prob_real, prob_fake], dtype=np.float32)
+            else:
+                # Multiple outputs: apply softmax
+                probs = torch.softmax(pred[0], dim=0).cpu().numpy()
         else:
-            flat = pred.view(pred.size(0), -1)
-            probs = torch.softmax(flat, dim=1).cpu().numpy()[0]
+            # Fallback: flatten and apply softmax
+            flat = pred.view(-1)
+            if flat.size(0) == 1:
+                prob_fake = torch.sigmoid(flat[0]).cpu().item()
+                prob_real = 1.0 - prob_fake
+                probs = np.array([prob_real, prob_fake], dtype=np.float32)
+            else:
+                probs = torch.softmax(flat, dim=0).cpu().numpy()
+    
+    # Ensure probabilities sum to 1 and are in valid range
+    probs = np.clip(probs, 0.0, 1.0)
+    probs = probs / (probs.sum() + 1e-8)  # Normalize
+    
     return probs
 
 def _predict_with_keras(model, input_np):
-    pred = model.predict(input_np)
+    """
+    Predict with Keras/TensorFlow model and return normalized probabilities.
+    Handles various output formats: logits, probabilities, single values.
+    """
+    pred = model.predict(input_np, verbose=0)
     pred = np.asarray(pred)
+    
+    # Flatten to 1D if needed
     if pred.ndim == 2 and pred.shape[0] == 1:
         probs = pred[0]
     elif pred.ndim == 1:
         probs = pred
+    elif pred.ndim == 0:
+        # Scalar output
+        probs = np.array([pred.item()])
     else:
+        # Flatten multi-dimensional output
         probs = pred.reshape(-1)
-    if np.any(probs < 0) or np.any(probs > 1):
-        exp = np.exp(probs - np.max(probs))
-        probs = exp / exp.sum()
+    
+    # Handle logits (values outside [0, 1] range)
+    # If single value and outside [0, 1], it's likely a logit
+    if probs.size == 1:
+        val = float(probs[0])
+        if val < 0 or val > 1:
+            # Apply sigmoid for binary classification
+            prob_fake = 1.0 / (1.0 + np.exp(-val))
+            prob_real = 1.0 - prob_fake
+            probs = np.array([prob_real, prob_fake], dtype=np.float32)
+        else:
+            # Already a probability, assume it's fake probability
+            prob_fake = val
+            prob_real = 1.0 - prob_fake
+            probs = np.array([prob_real, prob_fake], dtype=np.float32)
+    # If two values, check if they need normalization
+    elif probs.size == 2:
+        # Check if values are logits (outside [0, 1] or don't sum to ~1)
+        if np.any(probs < 0) or np.any(probs > 1) or abs(probs.sum() - 1.0) > 0.1:
+            # Apply softmax
+            exp = np.exp(probs - np.max(probs))
+            probs = exp / (exp.sum() + 1e-8)
+        else:
+            # Already probabilities, just normalize to ensure they sum to 1
+            probs = probs / (probs.sum() + 1e-8)
+    else:
+        # Multiple outputs: apply softmax
+        if np.any(probs < 0) or np.any(probs > 1):
+            exp = np.exp(probs - np.max(probs))
+            probs = exp / (exp.sum() + 1e-8)
+        else:
+            probs = probs / (probs.sum() + 1e-8)
+    
+    # Ensure probabilities are in valid range
+    probs = np.clip(probs, 0.0, 1.0)
+    probs = probs / (probs.sum() + 1e-8)  # Normalize again to ensure sum = 1
+    
     return probs
 
 # -----------------------
-# Simple occlusion heatmap generation
+# Heatmap generation using Grad-CAM (for Keras) and occlusion (fallback)
 # -----------------------
-def _generate_occlusion_heatmap_generic(predict_fn, img_pil: Image.Image, input_size: int, target_class_idx: int = 1,
-                                        patch_size: int = 32, stride: int = 16):
+def _generate_gradcam_heatmap_keras(model, img_pil: Image.Image, input_size: int, target_class_idx: int = 1):
+    """
+    Generate heatmap using Grad-CAM for Keras models.
+    Much faster and more accurate than occlusion-based methods.
+    """
+    if not TF_AVAILABLE:
+        return None
+    
+    try:
+        import tensorflow as tf
+        from tensorflow import keras
+        
+        # Preprocess image
+        img_resized = ImageOps.fit(img_pil.convert("RGB"), (input_size, input_size), Image.LANCZOS)
+        img_array = np.array(img_resized).astype(np.float32)
+        
+        # Normalize for ImageNet models
+        img_array = img_array / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        
+        # Find the last convolutional layer
+        last_conv_layer = None
+        for layer in reversed(model.layers):
+            if isinstance(layer, (keras.layers.Conv2D, keras.layers.SeparableConv2D, 
+                                keras.layers.DepthwiseConv2D)):
+                last_conv_layer = layer
+                break
+        
+        if last_conv_layer is None:
+            # Try to find any layer with spatial dimensions
+            for layer in reversed(model.layers):
+                if hasattr(layer, 'output_shape') and len(layer.output_shape) == 4:
+                    last_conv_layer = layer
+                    break
+        
+        if last_conv_layer is None:
+            return None
+        
+        # Create a model that outputs both the last conv layer and the final predictions
+        grad_model = keras.Model(
+            inputs=model.input,
+            outputs=[last_conv_layer.output, model.output]
+        )
+        
+        # Compute gradients
+        with tf.GradientTape() as tape:
+            outputs = grad_model(img_array)
+            # Handle both tuple and single output
+            if isinstance(outputs, (list, tuple)):
+                conv_outputs, predictions = outputs[0], outputs[1]
+            else:
+                # If only one output, try to get predictions from model directly
+                conv_outputs = outputs
+                predictions = model(img_array)
+            
+            # Ensure predictions is a tensor
+            if not isinstance(predictions, tf.Tensor):
+                predictions = tf.convert_to_tensor(predictions)
+            
+            # Get target class loss
+            # Handle different prediction shapes
+            if len(predictions.shape) == 0:
+                # Scalar output
+                loss = predictions
+            elif len(predictions.shape) == 1:
+                # 1D output - could be single value or 2-class
+                if predictions.shape[0] > target_class_idx:
+                    loss = predictions[target_class_idx]
+                else:
+                    loss = predictions[0]
+            else:
+                # 2D+ output - batch dimension first
+                if predictions.shape[-1] > target_class_idx:
+                    loss = predictions[:, target_class_idx] if len(predictions.shape) > 1 else predictions[target_class_idx]
+                else:
+                    loss = predictions[:, 0] if len(predictions.shape) > 1 else predictions[0]
+        
+        # Get gradients
+        grads = tape.gradient(loss, conv_outputs)
+        
+        # Global average pooling of gradients
+        pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+        
+        # Weight the feature maps by gradients
+        conv_outputs = conv_outputs[0]
+        heatmap = conv_outputs @ pooled_grads[..., tf.newaxis]
+        heatmap = tf.squeeze(heatmap)
+        
+        # Normalize heatmap
+        heatmap = tf.maximum(heatmap, 0) / (tf.math.reduce_max(heatmap) + 1e-8)
+        heatmap = heatmap.numpy()
+        
+        # Resize to input size (use PIL if cv2 not available)
+        try:
+            import cv2
+            heatmap = cv2.resize(heatmap, (input_size, input_size))
+        except ImportError:
+            # Fallback to PIL resize
+            from PIL import Image as PILImage
+            heatmap_pil = PILImage.fromarray((heatmap * 255).astype(np.uint8))
+            heatmap_pil = heatmap_pil.resize((input_size, input_size), Image.BILINEAR)
+            heatmap = np.array(heatmap_pil).astype(np.float32) / 255.0
+        heatmap = np.clip(heatmap, 0, 1)
+        
+        return heatmap
+        
+    except Exception as e:
+        print(f"[models_interface] Grad-CAM failed: {e}")
+        return None
+
+def _overlay_heatmap_on_image(img_pil: Image.Image, heatmap: np.ndarray, alpha: float = 0.5):
+    """
+    Overlay heatmap on original image with transparency.
+    """
+    w, h = img_pil.size
+    
+    # Resize heatmap to original image size
+    from PIL import Image as PILImage
+    heatmap_resized = PILImage.fromarray((heatmap * 255).astype(np.uint8)).resize((w, h), Image.BILINEAR)
+    heatmap_array = np.array(heatmap_resized).astype(np.float32) / 255.0
+    
+    # Apply colormap
+    cmap = plt.get_cmap("jet")
+    colored = cmap(heatmap_array)[:, :, :3]
+    colored = (colored * 255).astype(np.uint8)
+    heatmap_rgb = PILImage.fromarray(colored)
+    
+    # Blend with original image
+    img_rgb = img_pil.convert("RGB")
+    blended = PILImage.blend(img_rgb, heatmap_rgb, alpha)
+    
+    return blended
+
+def _generate_occlusion_heatmap_improved(predict_fn, img_pil: Image.Image, input_size: int, 
+                                         target_class_idx: int = 1, patch_size: int = 16, stride: int = 8):
+    """
+    Improved occlusion-based heatmap generation (faster with better quality).
+    """
     w, h = img_pil.size
     img_resized = ImageOps.fit(img_pil.convert("RGB"), (input_size, input_size), Image.LANCZOS)
     base_pred = predict_fn(img_resized)
     base_target = float(base_pred[target_class_idx]) if target_class_idx < len(base_pred) else float(base_pred[0])
+    
+    # Adaptive patch size based on input size
     ps = max(8, int(patch_size * input_size / 224))
     st = max(4, int(stride * input_size / 224))
+    
     heatmap = np.zeros((input_size, input_size), dtype=np.float32)
     counts = np.zeros_like(heatmap)
-    mean_color = tuple(map(int, ImageOps.fit(img_resized, (1,1)).getpixel((0,0))))
+    
+    # Use mean color of image for occlusion
+    img_array = np.array(img_resized)
+    mean_color = tuple(map(int, img_array.mean(axis=(0, 1))))
+    
+    # Process in batches for better performance
     for y in range(0, input_size - ps + 1, st):
         for x in range(0, input_size - ps + 1, st):
             occluded = img_resized.copy()
@@ -295,16 +751,49 @@ def _generate_occlusion_heatmap_generic(predict_fn, img_pil: Image.Image, input_
             drop = base_target - target_prob
             heatmap[y:y+ps, x:x+ps] += max(0.0, drop)
             counts[y:y+ps, x:x+ps] += 1.0
+    
+    # Normalize
     counts[counts == 0] = 1.0
     heatmap = heatmap / counts
     heatmap = np.clip(heatmap, 0.0, None)
+    
     if heatmap.max() > 0:
         heatmap = heatmap / heatmap.max()
-    cmap = plt.get_cmap("jet")
-    colored = cmap(heatmap)[:, :, :3]
-    colored = (colored * 255).astype(np.uint8)
-    heat_pil = Image.fromarray(colored).resize((w,h), Image.BILINEAR)
-    return heat_pil
+    
+    return heatmap
+
+def _generate_heatmap(model, img_pil: Image.Image, input_size: int, framework: str, 
+                     target_class_idx: int = 1, predict_fn=None):
+    """
+    Generate heatmap using the best available method for the model.
+    Tries Grad-CAM for Keras models, falls back to occlusion.
+    """
+    w, h = img_pil.size
+    
+    # Try Grad-CAM for Keras models
+    if framework in ("keras", "h5", "tf", "tfkeras") and TF_AVAILABLE:
+        heatmap = _generate_gradcam_heatmap_keras(model, img_pil, input_size, target_class_idx)
+        if heatmap is not None:
+            # Overlay on original image
+            result = _overlay_heatmap_on_image(img_pil, heatmap, alpha=0.5)
+            return result
+    
+    # Fallback to occlusion method
+    if predict_fn is None:
+        def predict_fn_local(pil_img):
+            if framework in ("pt", "pth", "torch", "torchscript"):
+                inp_t = _preprocess_for_torch(pil_img, input_size)
+                return _predict_with_torch(model, inp_t)
+            else:
+                inp_np = _preprocess_for_keras(pil_img, input_size)
+                return _predict_with_keras(model, inp_np)
+        predict_fn = predict_fn_local
+    
+    heatmap = _generate_occlusion_heatmap_improved(predict_fn, img_pil, input_size, target_class_idx)
+    
+    # Overlay on original image
+    result = _overlay_heatmap_on_image(img_pil, heatmap, alpha=0.5)
+    return result
 
 # -----------------------
 # Runner for single model
@@ -329,7 +818,27 @@ def _run_single_model(entry: Dict[str, Any], file_path: str, job_id: Optional[in
         }
 
     t0 = time.time()
-    img = Image.open(file_path).convert("RGB")
+    
+    # Load and validate image
+    try:
+        img = Image.open(file_path)
+        # Ensure image is RGB and has valid dimensions
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        
+        # Validate image dimensions
+        if img.size[0] < 32 or img.size[1] < 32:
+            raise ValueError(f"Image too small: {img.size}. Minimum size is 32x32 pixels.")
+        
+        # Verify image is not corrupted
+        img.verify()
+        # Reopen after verify (verify closes the image)
+        img = Image.open(file_path)
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+    except Exception as e:
+        raise RuntimeError(f"Failed to load or validate image: {str(e)}")
+    
     try:
         ext = (framework or os.path.splitext(entry.get("path",""))[1].lower()).lstrip(".")
         if ext in ("pt","pth","torch","torchscript"):
@@ -344,16 +853,74 @@ def _run_single_model(entry: Dict[str, Any], file_path: str, job_id: Optional[in
             probs = _predict_with_keras(model, inp_np)
 
         probs = np.asarray(probs).astype(np.float32)
+        
+        # Normalize probabilities to ensure they sum to 1
+        probs = probs / (probs.sum() + 1e-8)
+        probs = np.clip(probs, 0.0, 1.0)
+        probs = probs / (probs.sum() + 1e-8)  # Normalize again
+        
+        # Interpret probabilities based on size
+        # Check if model has explicit output_format configuration
+        output_format = entry.get("output_format", "standard")  # "standard" = [real, fake], "reversed" = [fake, real]
+        
         if probs.size >= 2:
-            confidence_real = float(probs[0])
-            confidence_fake = float(probs[1]) if probs.size > 1 else (1.0 - confidence_real)
-            label = "fake" if confidence_fake > confidence_real else "real"
-            target_idx = 1 if label == "fake" else 0
+            # Two or more values: check output format
+            val0, val1 = float(probs[0]), float(probs[1])
+            
+            if output_format == "reversed":
+                # Model outputs [fake, real]
+                confidence_real = val1
+                confidence_fake = val0
+            else:
+                # Standard: [real, fake]
+                confidence_real = val0
+                confidence_fake = val1
+            
+            # Sanity check: if probabilities are extremely skewed (>95% one way) and we haven't
+            # explicitly configured the format, try the alternative interpretation
+            # This helps catch models that output in reversed format
+            if output_format == "standard" and (confidence_fake > 0.95 or confidence_fake < 0.05):
+                # Try reversed interpretation
+                confidence_real_alt = val1
+                confidence_fake_alt = val0
+                # If reversed gives more balanced results, use it
+                if 0.1 < confidence_fake_alt < 0.9:
+                    print(f"[models_interface] Model '{name}' output appears reversed, using alternative interpretation")
+                    confidence_real = confidence_real_alt
+                    confidence_fake = confidence_fake_alt
         else:
-            confidence_fake = float(probs[0])
-            confidence_real = 1.0 - confidence_fake
-            label = "fake" if confidence_fake > confidence_real else "real"
-            target_idx = 1 if label == "fake" else 0
+            # Single value: could be fake probability or real probability
+            # Most binary classifiers output fake probability with sigmoid
+            val = float(probs[0])
+            if val > 0.5:
+                # Likely fake probability
+                confidence_fake = val
+                confidence_real = 1.0 - val
+            else:
+                # Could be real probability, or low fake probability
+                # Assume it's fake probability (common in binary classifiers)
+                confidence_fake = val
+                confidence_real = 1.0 - val
+        
+        # Ensure probabilities are valid
+        confidence_real = max(0.0, min(1.0, confidence_real))
+        confidence_fake = max(0.0, min(1.0, confidence_fake))
+        
+        # Normalize to ensure they sum to 1
+        total = confidence_real + confidence_fake
+        if total > 0:
+            confidence_real = confidence_real / total
+            confidence_fake = confidence_fake / total
+        else:
+            confidence_real = 0.5
+            confidence_fake = 0.5
+        
+        # Determine label
+        label = "fake" if confidence_fake > confidence_real else "real"
+        target_idx = 1 if label == "fake" else 0
+        
+        # Debug output
+        print(f"[models_interface] Model '{name}': real={confidence_real:.4f}, fake={confidence_fake:.4f}, label={label}")
 
         heatmap_path = "N/A"
         try:
@@ -366,12 +933,23 @@ def _run_single_model(entry: Dict[str, Any], file_path: str, job_id: Optional[in
                     inp_np_local = _preprocess_for_keras(pil_img, input_size)
                     return _predict_with_keras(model, inp_np_local)
 
-            heat_img = _generate_occlusion_heatmap_generic(predict_fn_for_heat, img, input_size, target_class_idx=target_idx)
+            # Use improved heatmap generation
+            ext_local = (framework or os.path.splitext(entry.get("path",""))[1].lower()).lstrip(".")
+            heat_img = _generate_heatmap(model, img, input_size, ext_local, 
+                                         target_class_idx=target_idx, 
+                                         predict_fn=predict_fn_for_heat)
+            
             fname = f"heatmap_{name}_{int(time.time()*1000)}_{os.getpid()}.png"
             heatpath = os.path.join(HEATMAP_DIR, fname)
-            heat_img.save(heatpath)
-            heatmap_path = heatpath
-        except Exception:
+            # Save with optimization to reduce file size
+            heat_img.save(heatpath, "PNG", optimize=True)
+            # Store just filename for API access (API will prepend HEATMAP_DIR)
+            heatmap_path = fname
+            print(f"[models_interface] ✓ Heatmap saved: {heatpath} (stored as: {heatmap_path})")
+        except Exception as e:
+            print(f"[models_interface] ✗ Heatmap generation failed for '{name}': {str(e)}")
+            import traceback
+            traceback.print_exc()
             heatmap_path = "N/A"
 
         t1 = time.time()
@@ -385,7 +963,8 @@ def _run_single_model(entry: Dict[str, Any], file_path: str, job_id: Optional[in
             "time_ms": round(time_ms, 2),
             "heatmap_path": heatmap_path,
         }
-    except Exception:
+    except Exception as e:
+        print(f"[models_interface] ✗ Model '{name}' prediction failed: {str(e)}")
         traceback.print_exc()
         return {
             "name": name,
@@ -395,49 +974,134 @@ def _run_single_model(entry: Dict[str, Any], file_path: str, job_id: Optional[in
             "label": "error",
             "time_ms": 0.0,
             "heatmap_path": "N/A",
+            "error": str(e),  # Include error message for debugging
         }
+
+# -----------------------
+# Model availability tracking
+# -----------------------
+# Track which models have been tested and whether they work
+_MODEL_AVAILABILITY: Dict[str, bool] = {}  # model name -> is_available
+_MODEL_AVAILABILITY_LOCK = threading.Lock()
+
+def clear_model_cache():
+    """Clear model availability and cache - useful when model config changes"""
+    global _MODEL_AVAILABILITY, _MODEL_CACHE
+    with _MODEL_AVAILABILITY_LOCK:
+        _MODEL_AVAILABILITY.clear()
+        _MODEL_CACHE.clear()
+        print("[models_interface] Model cache cleared")
+
+def _check_model_availability(entry: Dict[str, Any]) -> bool:
+    """Check if a model can be loaded. Caches the result."""
+    name = entry.get("name", "unknown")
+    
+    with _MODEL_AVAILABILITY_LOCK:
+        if name in _MODEL_AVAILABILITY:
+            return _MODEL_AVAILABILITY[name]
+        
+        # Try to load the model
+        try:
+            _load_model_entry(entry)
+            _MODEL_AVAILABILITY[name] = True
+            print(f"[models_interface] ✓ Model '{name}' is available")
+            return True
+        except Exception as e:
+            _MODEL_AVAILABILITY[name] = False
+            print(f"[models_interface] ✗ Model '{name}' failed to load: {str(e)}")
+            return False
+
+def _get_working_models() -> List[Dict[str, Any]]:
+    """Return only models that can be loaded successfully (lazy check)"""
+    working = []
+    for entry in MODEL_REGISTRY:
+        if _check_model_availability(entry):
+            working.append(entry)
+    return working
+
+def initialize_models():
+    """
+    Initialize and verify all models at startup.
+    This will cache working models and print status.
+    Call this at application startup for better error messages.
+    """
+    print("[models_interface] Initializing models...")
+    working = _get_working_models()
+    print(f"[models_interface] {len(working)}/{len(MODEL_REGISTRY)} models are available")
+    return working
 
 # -----------------------
 # Async runner used by tasks.py
 # -----------------------
 async def run_models_on_image(file_path: str, job_id: Optional[int] = None) -> Dict[str, Any]:
-    if not MODEL_REGISTRY:
-        raise RuntimeError("MODEL_REGISTRY empty. Edit app/models_interface.py and add models.")
+    """Run all working models on an image and return results"""
+    print(f"[models_interface] run_models_on_image called for file: {file_path}, job_id: {job_id}")
+    
+    # Check if file exists
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Image file not found: {file_path}")
+    
+    working_models = _get_working_models()
+    
+    if not working_models:
+        print("[models_interface] WARNING: No working models available!")
+        # Return empty results instead of raising error, so job can complete
+        return {
+            "models": [],
+            "consensus": {
+                "decision": "ERROR",
+                "score": 0.0,
+                "explanation": ["No working models available"]
+            }
+        }
+    
+    print(f"[models_interface] Running {len(working_models)} working models")
     results: List[Dict[str, Any]] = []
-    with ThreadPoolExecutor(max_workers=min(4, len(MODEL_REGISTRY))) as ex:
-        futures = [ex.submit(_run_single_model, entry, file_path, job_id) for entry in MODEL_REGISTRY]
+    with ThreadPoolExecutor(max_workers=min(4, len(working_models))) as ex:
+        futures = [ex.submit(_run_single_model, entry, file_path, job_id) for entry in working_models]
         for fut in as_completed(futures):
             try:
                 r = fut.result()
+                # Only include results that are not errors
+                if r.get("label") != "error":
+                    results.append(r)
+                else:
+                    print(f"[models_interface] Skipping error result from model: {r.get('name', 'unknown')}")
             except Exception as e:
                 traceback.print_exc()
-                r = {
-                    "name": "unknown",
-                    "version": "1.0",
-                    "confidence_real": 0.5,
-                    "confidence_fake": 0.5,
-                    "label": "error",
-                    "time_ms": 0.0,
-                    "heatmap_path": "N/A",
-                }
-            results.append(r)
+                print(f"[models_interface] Model execution failed: {str(e)}")
+                # Skip failed models - don't add error results
 
-    # consensus
+    # consensus - only based on working model results
     try:
-        labels = [r.get("label","unknown") for r in results]
-        fake_count = labels.count("fake")
-        real_count = labels.count("real")
-        if fake_count > real_count:
-            decision = "FAKE"
-            avg_conf = float(sum(r.get("confidence_fake",0.5) for r in results)/max(1,len(results)))
-        elif real_count > fake_count:
-            decision = "REAL"
-            avg_conf = float(sum(r.get("confidence_real",0.5) for r in results)/max(1,len(results)))
+        if not results:
+            consensus = {
+                "decision": "ERROR",
+                "score": 0.0,
+                "explanation": ["No models were able to process the image"]
+            }
         else:
-            decision = "UNCERTAIN"
-            avg_conf = 0.5
-        consensus = {"decision": decision, "score": avg_conf, "explanation": ["Analyzed by models"]}
-    except Exception:
+            labels = [r.get("label", "unknown") for r in results]
+            fake_count = labels.count("fake")
+            real_count = labels.count("real")
+            
+            if fake_count > real_count:
+                decision = "FAKE"
+                avg_conf = float(sum(r.get("confidence_fake", 0.5) for r in results) / len(results))
+            elif real_count > fake_count:
+                decision = "REAL"
+                avg_conf = float(sum(r.get("confidence_real", 0.5) for r in results) / len(results))
+            else:
+                decision = "UNCERTAIN"
+                avg_conf = 0.5
+            
+            consensus = {
+                "decision": decision,
+                "score": avg_conf,
+                "explanation": [f"Analyzed by {len(results)} model(s)"]
+            }
+    except Exception as e:
+        print(f"[models_interface] Error calculating consensus: {str(e)}")
         consensus = {"decision": "PENDING", "score": 0.0, "explanation": []}
 
     return {"models": results, "consensus": consensus}

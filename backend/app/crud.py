@@ -26,8 +26,10 @@ def create_job(img_id: str, filename: str, db: Session, user_id: int = None):
 
 
 def get_job(job_id: int, db: Session):
+    from sqlalchemy.orm import joinedload
     return (
         db.query(models.Job)
+        .options(joinedload(models.Job.results))  # Eagerly load results
         .filter(models.Job.id == job_id)
         .first()
     )
@@ -35,7 +37,8 @@ def get_job(job_id: int, db: Session):
 
 def get_recent_jobs(db: Session, user_id: int = None):
     """Get recent jobs, optionally filtered by user"""
-    query = db.query(models.Job)
+    from sqlalchemy.orm import joinedload
+    query = db.query(models.Job).options(joinedload(models.Job.results))  # Eagerly load results
     if user_id:
         query = query.filter(models.Job.user_id == user_id)
     return (
@@ -70,3 +73,10 @@ def update_job_status(job_id, status, db: Session):
         db.commit()
         db.refresh(job)
     return job
+
+
+def delete_job_results(job_id: int, db: Session):
+    """Delete all model results for a job to allow re-analysis"""
+    deleted = db.query(models.ModelResult).filter(models.ModelResult.job_id == job_id).delete()
+    db.commit()
+    return deleted

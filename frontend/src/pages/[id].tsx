@@ -3,28 +3,73 @@ import dynamic from "next/dynamic";
 import ConsensusCard from "../../src/components/ConsensusCard";
 import ModelResultCard from "../../src/components/ModelResultCard";
 import useSWR from "swr";
-import { fetcher } from "../../src/lib/api";
+import { fetcher, getAuthHeaders } from "../../src/lib/api";
 import { useRouter } from "next/router";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Download, Loader2 } from "lucide-react";
+import { useState } from "react";
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
 
 export default function ResultPage() {
   const router = useRouter();
   const { id } = router.query;
+  const [isRerunning, setIsRerunning] = useState(false);
 
-  const { data: job, error } = useSWR(
+  const { data: job, error, mutate } = useSWR(
     () => (id ? `/api/jobs/${id}` : null),
     fetcher,
-    { refreshInterval: 2000 }
+    { 
+      refreshInterval: (data) => {
+        // Keep refreshing if job is processing, stop when completed
+        if (data?.status === "pending" || data?.status === "processing") {
+          return 1000; // Refresh every 1 second when processing
+        }
+        return 0; // Stop auto-refresh when completed
+      },
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+    }
   );
 
   const isLoading = !job && !error;
   const isProcessing =
     job?.status === "pending" || job?.status === "processing";
+
+  const handleRerun = async () => {
+    if (!id || isRerunning) return;
+    
+    setIsRerunning(true);
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE}/api/jobs/${id}/rerun`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        alert(`Failed to re-run analysis: ${error.detail || "Unknown error"}`);
+        return;
+      }
+      
+      // Immediately refresh the job data to show pending status
+      await mutate();
+      // Show success message
+      alert("Analysis re-run started! The page will update automatically.");
+    } catch (err) {
+      console.error("Error re-running analysis:", err);
+      alert("Failed to re-run analysis. Please try again.");
+    } finally {
+      setIsRerunning(false);
+    }
+  };
 
   // ---------- LOADING UI ----------
   if (isLoading) {
@@ -104,9 +149,23 @@ export default function ResultPage() {
 
             {/* Buttons */}
             <div className="space-y-3">
-              <Button variant="outline" className="w-full">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Re-run Analysis
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleRerun}
+                disabled={isRerunning || isProcessing}
+              >
+                {isRerunning ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Re-running...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Re-run Analysis
+                  </>
+                )}
               </Button>
 
               <Button variant="outline" className="w-full">
