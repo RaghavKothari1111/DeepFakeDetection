@@ -2,10 +2,32 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 import { register, login } from "@/lib/api";
+
+export async function getServerSideProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "en", ["common"])),
+    },
+  };
+}
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t, ready } = useTranslation("common");
+  
+  // Helper to safely get translations
+  const getText = (key: string, fallback: string) => {
+    if (!ready) return fallback;
+    try {
+      const translated = t(key);
+      return translated === key ? fallback : translated;
+    } catch {
+      return fallback;
+    }
+  };
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,12 +41,12 @@ export default function RegisterPage() {
 
     // Validation
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(getText("register.passwordsNoMatch", "Passwords do not match"));
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(getText("register.passwordTooShort", "Password must be at least 6 characters"));
       return;
     }
 
@@ -39,7 +61,7 @@ export default function RegisterPage() {
       
       router.push("/indexloggedin");
     } catch (err: any) {
-      setError(err.message || "Registration failed");
+      setError(err.message || getText("register.registrationFailed", "Registration failed"));
     } finally {
       setLoading(false);
     }
@@ -56,8 +78,8 @@ export default function RegisterPage() {
           <div className="h-12 w-12 bg-indigo-600 text-white font-bold rounded-md flex items-center justify-center mx-auto mb-4">
             D
           </div>
-          <h1 className="text-2xl font-bold text-slate-800">Create Account</h1>
-          <p className="text-slate-600 mt-2">Sign up to get started</p>
+          <h1 className="text-2xl font-bold text-slate-800">{getText("register.title", "Create Account")}</h1>
+          <p className="text-slate-600 mt-2">{getText("register.subtitle", "Sign up to get started")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -69,7 +91,7 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
-              Username
+              {getText("register.username", "Username")}
             </label>
             <input
               id="username"
@@ -78,13 +100,13 @@ export default function RegisterPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Choose a username"
+              placeholder={getText("register.usernamePlaceholder", "Choose a username")}
             />
           </div>
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-              Email
+              {getText("register.email", "Email")}
             </label>
             <input
               id="email"
@@ -93,13 +115,13 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter your email"
+              placeholder={getText("register.emailPlaceholder", "Enter your email")}
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-              Password
+              {getText("register.password", "Password")}
             </label>
             <input
               id="password"
@@ -109,13 +131,13 @@ export default function RegisterPage() {
               required
               minLength={6}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Create a password (min 6 characters)"
+              placeholder={getText("register.passwordPlaceholder", "Create a password (min 6 characters)")}
             />
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-2">
-              Confirm Password
+              {getText("register.confirmPassword", "Confirm Password")}
             </label>
             <input
               id="confirmPassword"
@@ -124,7 +146,7 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Confirm your password"
+              placeholder={getText("register.confirmPasswordPlaceholder", "Confirm your password")}
             />
           </div>
 
@@ -133,15 +155,15 @@ export default function RegisterPage() {
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
-            {loading ? "Creating account..." : "Create Account"}
+            {loading ? getText("register.creatingAccount", "Creating account...") : getText("register.createAccount", "Create Account")}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-slate-600">
-            Already have an account?{" "}
+            {getText("register.haveAccount", "Already have an account?")}{" "}
             <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
-              Sign in
+              {getText("register.signIn", "Sign in")}
             </Link>
           </p>
         </div>

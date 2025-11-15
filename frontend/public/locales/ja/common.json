@@ -1,0 +1,229 @@
+{
+  "navbar": {
+    "title": "DeepVerify",
+    "dashboard": "ダッシュボード",
+    "membership": "メンバーシップ",
+    "support": "サポート",
+    "signIn": "サインイン",
+    "signUp": "サインアップ",
+    "signOut": "サインアウト"
+  },
+  "home": {
+    "title": "マルチモデルディープフェイク検出",
+    "subtitle": "5つの高度なAIモデルを使用したプロフェッショナルな真正性分析。ヒートマップの可視化と信頼度スコアを含む詳細レポートを取得します。",
+    "getStarted": "始める",
+    "learnMore": "詳細を見る",
+    "trustedBy": "研究者に信頼されています",
+    "accuracy": "99.2%の精度",
+    "secure": "安全でプライベート",
+    "tryItNow": "今すぐ試す",
+    "tryItDescription": "画像をアップロードして、検出パイプラインの動作を確認してください。",
+    "signInToSave": "サインインして分析履歴を保存し、より多くの機能のロックを解除します。",
+    "powerfulFeatures": "強力な機能",
+    "featuresSubtitle": "プロフェッショナルなディープフェイク検出に必要なすべて。",
+    "readyToVerify": "真正性を確認する準備はできましたか？",
+    "readyDescription": "DeepVerifyを使用している何千人もの研究者、ジャーナリスト、セキュリティ専門家に参加してください。",
+    "signInToGetStarted": "サインインして始める",
+    "footer": "© 2025 DeepVerify。プロフェッショナルなディープフェイク検出プラットフォーム。",
+    "features": {
+      "modelPipeline": {
+        "title": "5モデルAIパイプライン",
+        "description": "複数の最先端検出モデルが画像を同時に分析します。"
+      },
+      "heatmap": {
+        "title": "ヒートマップ可視化",
+        "description": "インタラクティブなヒートマップは、モデルが操作を検出する正確な場所を示します。"
+      },
+      "accuracy": {
+        "title": "高精度",
+        "description": "アンサンブルモデルアプローチは、業界をリードする検出精度を実現します。"
+      },
+      "fast": {
+        "title": "高速処理",
+        "description": "最適化された推論パイプラインは、数秒で結果を返します。"
+      },
+      "secure": {
+        "title": "安全でプライベート",
+        "description": "すべての画像はローカルで処理され、厳格なプライバシー基準で保護されています。"
+      },
+      "downloadable": {
+        "title": "ダウンロード可能なレポート",
+        "description": "完全な再構築とレポートデータをPDF形式でエクスポートします。"
+      }
+    }
+  },
+  "upload": {
+    "title": "分析する画像をアップロード",
+    "description": "画像をここにドラッグ＆ドロップするか、クリックして閲覧",
+    "supported": "JPG、PNGをサポート • 最大10MB",
+    "chooseFile": "ファイルを選択",
+    "analyzing": "分析中…",
+    "uploadAnalyze": "アップロードして分析",
+    "selectFileFirst": "まずファイルを選択してください",
+    "onlyJpegPng": "JPEGとPNGのみ許可",
+    "maxFileSize": "最大ファイルサイズは10MBです",
+    "uploadSucceeded": "アップロードは成功しましたが、サーバーの応答が予期しないものでした。",
+    "uploadFailed": "アップロードに失敗しました",
+    "notSignedIn": "サインインしていません。アップロードは可能ですが、一部の機能にはアカウントが必要な場合があります。",
+    "logIn": "ログイン",
+    "goToLogin": "ログインへ移動 →",
+    "supportedFormats": "サポート：JPG、PNG — 最大10MB。アップロードすることで、利用規約に同意したことになります。"
+  },
+  "login": {
+    "title": "おかえりなさい",
+    "subtitle": "アカウントにサインイン",
+    "username": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を入力",
+    "password": "パスワード",
+    "passwordPlaceholder": "パスワードを入力",
+    "signingIn": "サインイン中...",
+    "signIn": "サインイン",
+    "loginFailed": "ログインに失敗しました",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "createOne": "作成する"
+  },
+  "register": {
+    "title": "アカウントを作成",
+    "subtitle": "始めるためにサインアップ",
+    "username": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を選択",
+    "email": "メールアドレス",
+    "emailPlaceholder": "メールアドレスを入力",
+    "password": "パスワード",
+    "passwordPlaceholder": "パスワードを作成（最低6文字）",
+    "confirmPassword": "パスワードを確認",
+    "confirmPasswordPlaceholder": "パスワードを確認",
+    "creatingAccount": "アカウント作成中...",
+    "createAccount": "アカウントを作成",
+    "passwordsNoMatch": "パスワードが一致しません",
+    "passwordTooShort": "パスワードは最低6文字である必要があります",
+    "registrationFailed": "登録に失敗しました",
+    "haveAccount": "すでにアカウントをお持ちですか？",
+    "signIn": "サインイン"
+  },
+  "dashboard": {
+    "title": "分析履歴",
+    "subtitle": "最近のディープフェイク検出分析",
+    "newAnalysis": "新しい分析",
+    "noAnalyses": "まだ分析がありません",
+    "noAnalysesDescription": "最初の画像をアップロードして、マルチモデル分析パイプラインでディープフェイクの検出を開始してください。",
+    "uploadImage": "画像をアップロード"
+  },
+  "result": {
+    "title": "分析結果",
+    "perModelBreakdown": "モデル別内訳",
+    "analyzedImage": "分析された画像",
+    "rerunAnalysis": "分析を再実行",
+    "rerunning": "再実行中...",
+    "downloadPdf": "PDFをダウンロード",
+    "details": "詳細",
+    "uploaded": "アップロード済み",
+    "jobNotFound": "ジョブが見つかりません。",
+    "rerunFailed": "分析の再実行に失敗しました",
+    "rerunStarted": "分析の再実行が開始されました！ページは自動的に更新されます。",
+    "rerunError": "分析の再実行に失敗しました。もう一度お試しください。"
+  },
+  "language": {
+    "selectLanguage": "言語を選択",
+    "chooseLanguage": "希望する言語を選択してください",
+    "continue": "続ける",
+    "english": "英語",
+    "spanish": "スペイン語",
+    "french": "フランス語",
+    "german": "ドイツ語",
+    "hindi": "ヒンディー語",
+    "chinese": "中国語",
+    "japanese": "日本語",
+    "arabic": "アラビア語"
+  },
+  "consensus": {
+    "likelyAuthentic": "おそらく本物",
+    "likelyManipulated": "おそらく操作されています",
+    "uncertain": "不明",
+    "finalVerdict": "複数の検出モデルに基づく最終判定",
+    "confidenceScore": "信頼度スコア",
+    "keyFindings": "主な発見"
+  },
+  "model": {
+    "execution": "ミリ秒実行",
+    "confidence": "信頼度",
+    "heatmapAnalysis": "ヒートマップ分析",
+    "original": "オリジナル",
+    "heatmapOverlay": "ヒートマップオーバーレイ",
+    "overlayOpacity": "オーバーレイの不透明度",
+    "modelNotes": "モデルノート："
+  },
+  "loggedIn": {
+    "quickVerify": "クイック検証 — 分析を開始するために画像をアップロード",
+    "quickVerifyDescription": "高速で説明可能なマルチモデル真正性チェック。アップロードはプライベートで迅速に処理されます。",
+    "uploadAnalyze": "アップロードして分析",
+    "uploadDescription": "画像（PNG、JPG）をドラッグ＆ドロップ。結果には、コンセンサス判定、信頼度スコア、ヒートマップが含まれます。",
+    "uploadImage": "画像をアップロード",
+    "viewHistory": "履歴を表示",
+    "quickActions": "クイックアクション",
+    "viewDashboard": "ダッシュボードを表示",
+    "openSampleReport": "サンプルレポートを開く",
+    "recentAnalyses": "最近の分析",
+    "viewAllAnalyses": "すべての分析を表示 →",
+    "securePrivate": "安全でプライベート",
+    "analysisEncrypted": "転送中に暗号化された分析",
+    "needHelp": "結果の解釈にヘルプが必要ですか？",
+    "contactSupport": "より深い分析とコンサルティングのために研究チームにお問い合わせください。",
+    "contactSupportButton": "サポートに連絡"
+  },
+  "membership": {
+    "title": "プロフェッショナル向けメンバーシッププラン",
+    "subtitle": "優先処理、バッチアップロード、ダウンロード可能なレポートのロックを解除します。チームのニーズに合ったプランを選択してください。",
+    "whyUpgrade": "なぜアップグレードするのですか？",
+    "priorityProcessing": "優先処理",
+    "priorityProcessingDesc": "時間に敏感な分析のための短いキュー時間。",
+    "batchUploads": "バッチアップロード",
+    "batchUploadsDesc": "複数の画像を同時に処理します。",
+    "downloadableReports": "ダウンロード可能なレポート",
+    "downloadableReportsDesc": "モデル出力とヒートマップを含むPDFをエクスポートします。",
+    "enterpriseContact": "エンタープライズ機能が必要ですか？営業にお問い合わせください →",
+    "proMonthly": "プロ — 月額",
+    "proYearly": "プロ — 年間",
+    "billedMonthly": "月額請求、いつでもキャンセル可能",
+    "bestValue": "最高の価値 — 20%節約",
+    "perMonth": "月額",
+    "perYear": "年間",
+    "features": {
+      "priority": "優先処理",
+      "uploads25": "25アップロード / 月",
+      "uploads300": "300アップロード / 年",
+      "pdfReports": "ダウンロード可能なPDFレポート",
+      "emailSupport": "メールサポート",
+      "prioritySupport": "優先メールサポート"
+    },
+    "startPro": "プロを開始",
+    "startYearly": "年間を開始",
+    "redirecting": "リダイレクト中…",
+    "faq": "よくある質問",
+    "cancelAnytime": "いつでもキャンセルできますか？",
+    "cancelAnswer": "はい — 月額プランは、ペナルティなしでアカウントページからキャンセルできます。",
+    "teamPlans": "チームまたはエンタープライズプランを提供していますか？",
+    "teamPlansAnswer": "はい — カスタマイズされたプランについては、サポートページから営業チームにお問い合わせください。"
+  },
+  "support": {
+    "title": "サポートとヘルプセンター",
+    "subtitle": "お手伝いします。以下でチケットを送信するか、ドキュメントとFAQを閲覧してください。",
+    "contactSupport": "サポートに連絡",
+    "name": "名前",
+    "namePlaceholder": "お名前（任意）",
+    "email": "メールアドレス",
+    "emailPlaceholder": "you@domain.com",
+    "message": "メッセージ",
+    "messagePlaceholder": "問題やリクエストを説明してください",
+    "sendMessage": "メッセージを送信",
+    "sending": "送信中...",
+    "success": "ありがとうございます — すぐに返信いたします。",
+    "error": "メッセージの送信にエラーが発生しました。もう一度お試しください。",
+    "quickResources": "クイックリソース",
+    "documentation": "ドキュメント",
+    "faq": "FAQ",
+    "billingPlans": "請求とプラン",
+    "officeHours": "営業時間",
+    "officeHoursTime": "月〜金、09:00–18:00 UTC"
+  }
+}

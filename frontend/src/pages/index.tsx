@@ -1,4 +1,6 @@
 import Head from "next/head";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 import UploadCard from "@/components/UploadCard";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
@@ -12,43 +14,47 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
+
+export async function getServerSideProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "en", ["common"])),
+    },
+  };
+}
+
 export default function Home() {
+  const { t } = useTranslation("common");
   const features = [
     {
       icon: Layers,
-      title: "5-Model AI Pipeline",
-      description:
-        "Multiple state-of-the-art detection models analyze your image simultaneously.",
+      title: t("home.features.modelPipeline.title"),
+      description: t("home.features.modelPipeline.description"),
     },
     {
       icon: Flame,
-      title: "Heatmap Visualization",
-      description:
-        "Interactive heatmaps show exactly where models detect manipulation.",
+      title: t("home.features.heatmap.title"),
+      description: t("home.features.heatmap.description"),
     },
     {
       icon: Zap,
-      title: "High Accuracy",
-      description:
-        "Ensemble model approach achieves industry-leading detection accuracy.",
+      title: t("home.features.accuracy.title"),
+      description: t("home.features.accuracy.description"),
     },
     {
       icon: Zap,
-      title: "Fast Processing",
-      description:
-        "Optimized inference pipeline returns results in seconds.",
+      title: t("home.features.fast.title"),
+      description: t("home.features.fast.description"),
     },
     {
       icon: Lock,
-      title: "Secure & Private",
-      description:
-        "All images processed locally and protected with strict privacy standards.",
+      title: t("home.features.secure.title"),
+      description: t("home.features.secure.description"),
     },
     {
       icon: FileDown,
-      title: "Downloadable Reports",
-      description:
-        "Export full reconstruction and report data in PDF format.",
+      title: t("home.features.downloadable.title"),
+      description: t("home.features.downloadable.description"),
     },
   ];
 
@@ -72,22 +78,21 @@ export default function Home() {
             <div className="max-w-4xl mx-auto text-center space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-                  Multi-Model Deepfake Detection
+                  {t("home.title")}
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Professional authenticity analysis using 5 advanced AI models.
-                  Get detailed reports with heatmap visualizations and confidence scores.
+                  {t("home.subtitle")}
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <a href="/login">
-                  <Button size="lg">Get Started</Button>
+                  <Button size="lg">{t("home.getStarted")}</Button>
                 </a>
 
                 <a href="#features">
                   <Button variant="outline" size="lg">
-                    Learn More
+                    {t("home.learnMore")}
                   </Button>
                 </a>
               </div>
@@ -95,15 +100,15 @@ export default function Home() {
               <div className="flex flex-wrap items-center justify-center gap-8 pt-8 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />
-                  <span>Trusted by researchers</span>
+                  <span>{t("home.trustedBy")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-primary" />
-                  <span>99.2% accuracy</span>
+                  <span>{t("home.accuracy")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Lock className="h-4 w-4 text-primary" />
-                  <span>Secure & private</span>
+                  <span>{t("home.secure")}</span>
                 </div>
               </div>
             </div>
@@ -114,16 +119,16 @@ export default function Home() {
         <section className="py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mx-auto text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">Try It Now</h2>
+              <h2 className="text-3xl font-bold">{t("home.tryItNow")}</h2>
               <p className="text-muted-foreground">
-                Upload an image to see how our detection pipeline works.
+                {t("home.tryItDescription")}
               </p>
             </div>
 
             <UploadCard />
 
             <p className="text-center text-sm text-muted-foreground mt-4">
-              Sign in to save your analysis history and unlock more features.
+              {t("home.signInToSave")}
             </p>
           </div>
         </section>
@@ -133,9 +138,9 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12 space-y-2">
-                <h2 className="text-3xl font-bold">Powerful Features</h2>
+                <h2 className="text-3xl font-bold">{t("home.powerfulFeatures")}</h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Everything you need for professional deepfake detection.
+                  {t("home.featuresSubtitle")}
                 </p>
               </div>
 
@@ -158,14 +163,14 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center space-y-8">
               <h2 className="text-3xl md:text-4xl font-bold">
-                Ready to verify authenticity?
+                {t("home.readyToVerify")}
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Join thousands of researchers, journalists, and security professionals using DeepVerify.
+                {t("home.readyDescription")}
               </p>
 
               <a href="/login" className="mt-6 block">
-                <Button size="lg">Sign In to Get Started</Button>
+                <Button size="lg">{t("home.signInToGetStarted")}</Button>
               </a>
             </div>
           </div>
@@ -175,7 +180,7 @@ export default function Home() {
       <footer className="border-t py-8">
         <div className="container mx-auto px-4">
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 DeepVerify. Professional deepfake detection platform.
+            {t("home.footer")}
           </p>
         </div>
       </footer>

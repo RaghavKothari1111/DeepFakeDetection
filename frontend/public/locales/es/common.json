@@ -1,0 +1,229 @@
+{
+  "navbar": {
+    "title": "DeepVerify",
+    "dashboard": "Panel",
+    "membership": "Membresía",
+    "support": "Soporte",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión"
+  },
+  "home": {
+    "title": "Detección de Deepfake Multi-Modelo",
+    "subtitle": "Análisis profesional de autenticidad utilizando 5 modelos avanzados de IA. Obtenga informes detallados con visualizaciones de mapas de calor y puntuaciones de confianza.",
+    "getStarted": "Comenzar",
+    "learnMore": "Saber Más",
+    "trustedBy": "Confiado por investigadores",
+    "accuracy": "99.2% de precisión",
+    "secure": "Seguro y privado",
+    "tryItNow": "Pruébalo Ahora",
+    "tryItDescription": "Sube una imagen para ver cómo funciona nuestro sistema de detección.",
+    "signInToSave": "Inicia sesión para guardar tu historial de análisis y desbloquear más funciones.",
+    "powerfulFeatures": "Características Potentes",
+    "featuresSubtitle": "Todo lo que necesitas para la detección profesional de deepfakes.",
+    "readyToVerify": "¿Listo para verificar la autenticidad?",
+    "readyDescription": "Únete a miles de investigadores, periodistas y profesionales de seguridad que usan DeepVerify.",
+    "signInToGetStarted": "Inicia Sesión para Comenzar",
+    "footer": "© 2025 DeepVerify. Plataforma profesional de detección de deepfakes.",
+    "features": {
+      "modelPipeline": {
+        "title": "Pipeline de IA de 5 Modelos",
+        "description": "Múltiples modelos de detección de última generación analizan tu imagen simultáneamente."
+      },
+      "heatmap": {
+        "title": "Visualización de Mapa de Calor",
+        "description": "Los mapas de calor interactivos muestran exactamente dónde los modelos detectan manipulación."
+      },
+      "accuracy": {
+        "title": "Alta Precisión",
+        "description": "El enfoque de modelo conjunto logra una precisión de detección líder en la industria."
+      },
+      "fast": {
+        "title": "Procesamiento Rápido",
+        "description": "El pipeline de inferencia optimizado devuelve resultados en segundos."
+      },
+      "secure": {
+        "title": "Seguro y Privado",
+        "description": "Todas las imágenes se procesan localmente y están protegidas con estándares estrictos de privacidad."
+      },
+      "downloadable": {
+        "title": "Informes Descargables",
+        "description": "Exporte datos completos de reconstrucción e informes en formato PDF."
+      }
+    }
+  },
+  "upload": {
+    "title": "Sube una imagen para analizar",
+    "description": "Arrastra y suelta tu imagen aquí, o haz clic para explorar",
+    "supported": "Soporta JPG, PNG • Máx 10MB",
+    "chooseFile": "Elegir archivo",
+    "analyzing": "Analizando…",
+    "uploadAnalyze": "Subir y Analizar",
+    "selectFileFirst": "Selecciona un archivo primero",
+    "onlyJpegPng": "Solo se permiten JPEG y PNG",
+    "maxFileSize": "El tamaño máximo del archivo es 10MB",
+    "uploadSucceeded": "La carga se completó pero la respuesta del servidor fue inesperada.",
+    "uploadFailed": "Error al subir",
+    "notSignedIn": "No has iniciado sesión. Aún puedes subir, pero algunas funciones pueden requerir una cuenta.",
+    "logIn": "Iniciar sesión",
+    "goToLogin": "Ir a Iniciar Sesión →",
+    "supportedFormats": "Soportado: JPG, PNG — máx 10MB. Al subir aceptas nuestros términos."
+  },
+  "login": {
+    "title": "Bienvenido de Nuevo",
+    "subtitle": "Inicia sesión en tu cuenta",
+    "username": "Nombre de Usuario",
+    "usernamePlaceholder": "Ingresa tu nombre de usuario",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "signingIn": "Iniciando sesión...",
+    "signIn": "Iniciar Sesión",
+    "loginFailed": "Error al iniciar sesión",
+    "noAccount": "¿No tienes una cuenta?",
+    "createOne": "Crea una"
+  },
+  "register": {
+    "title": "Crear Cuenta",
+    "subtitle": "Regístrate para comenzar",
+    "username": "Nombre de Usuario",
+    "usernamePlaceholder": "Elige un nombre de usuario",
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "Ingresa tu correo electrónico",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Crea una contraseña (mín 6 caracteres)",
+    "confirmPassword": "Confirmar Contraseña",
+    "confirmPasswordPlaceholder": "Confirma tu contraseña",
+    "creatingAccount": "Creando cuenta...",
+    "createAccount": "Crear Cuenta",
+    "passwordsNoMatch": "Las contraseñas no coinciden",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+    "registrationFailed": "Error al registrarse",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "signIn": "Iniciar sesión"
+  },
+  "dashboard": {
+    "title": "Historial de Análisis",
+    "subtitle": "Tus análisis recientes de detección de deepfakes",
+    "newAnalysis": "Nuevo Análisis",
+    "noAnalyses": "Aún no hay análisis",
+    "noAnalysesDescription": "Sube tu primera imagen para comenzar a detectar deepfakes con nuestro pipeline de análisis multi-modelo.",
+    "uploadImage": "Subir Imagen"
+  },
+  "result": {
+    "title": "Resultados del Análisis",
+    "perModelBreakdown": "Desglose por Modelo",
+    "analyzedImage": "Imagen Analizada",
+    "rerunAnalysis": "Re-ejecutar Análisis",
+    "rerunning": "Re-ejecutando...",
+    "downloadPdf": "Descargar PDF",
+    "details": "Detalles",
+    "uploaded": "Subido",
+    "jobNotFound": "Trabajo no encontrado.",
+    "rerunFailed": "Error al re-ejecutar el análisis",
+    "rerunStarted": "¡Re-ejecución del análisis iniciada! La página se actualizará automáticamente.",
+    "rerunError": "Error al re-ejecutar el análisis. Por favor, inténtalo de nuevo."
+  },
+  "language": {
+    "selectLanguage": "Seleccionar Idioma",
+    "chooseLanguage": "Elige tu idioma preferido",
+    "continue": "Continuar",
+    "english": "Inglés",
+    "spanish": "Español",
+    "french": "Francés",
+    "german": "Alemán",
+    "hindi": "Hindi",
+    "chinese": "Chino",
+    "japanese": "Japonés",
+    "arabic": "Árabe"
+  },
+  "consensus": {
+    "likelyAuthentic": "Probablemente Auténtico",
+    "likelyManipulated": "Probablemente Manipulado",
+    "uncertain": "Incierto",
+    "finalVerdict": "Veredicto final basado en múltiples modelos de detección",
+    "confidenceScore": "Puntuación de Confianza",
+    "keyFindings": "Hallazgos Clave"
+  },
+  "model": {
+    "execution": "ms de ejecución",
+    "confidence": "Confianza",
+    "heatmapAnalysis": "Análisis de Mapa de Calor",
+    "original": "Original",
+    "heatmapOverlay": "Superposición de mapa de calor",
+    "overlayOpacity": "Opacidad de Superposición",
+    "modelNotes": "Notas del Modelo:"
+  },
+  "loggedIn": {
+    "quickVerify": "Verificación Rápida — Sube una imagen para comenzar el análisis",
+    "quickVerifyDescription": "Verificaciones de autenticidad rápidas, explicables y multi-modelo. Tus cargas son privadas y se procesan rápidamente.",
+    "uploadAnalyze": "Subir y Analizar",
+    "uploadDescription": "Arrastra y suelta una imagen (PNG, JPG). Los resultados incluyen un veredicto de consenso, puntuaciones de confianza y mapas de calor.",
+    "uploadImage": "Subir Imagen",
+    "viewHistory": "Ver Historial",
+    "quickActions": "Acciones Rápidas",
+    "viewDashboard": "Ver Panel",
+    "openSampleReport": "Abrir Informe de Ejemplo",
+    "recentAnalyses": "Análisis Recientes",
+    "viewAllAnalyses": "Ver todos los análisis →",
+    "securePrivate": "Seguro y Privado",
+    "analysisEncrypted": "Análisis encriptado en tránsito",
+    "needHelp": "¿Necesitas ayuda para interpretar un resultado?",
+    "contactSupport": "Contacta a nuestro equipo de investigación para un análisis más profundo y consultoría.",
+    "contactSupportButton": "Contactar Soporte"
+  },
+  "membership": {
+    "title": "Planes de membresía para profesionales",
+    "subtitle": "Desbloquea procesamiento prioritario, cargas por lotes e informes descargables. Selecciona un plan que se ajuste a las necesidades de tu equipo.",
+    "whyUpgrade": "¿Por qué actualizar?",
+    "priorityProcessing": "Procesamiento prioritario",
+    "priorityProcessingDesc": "Tiempos de cola más cortos para análisis urgentes.",
+    "batchUploads": "Cargas por lotes",
+    "batchUploadsDesc": "Procesa múltiples imágenes simultáneamente.",
+    "downloadableReports": "Informes descargables",
+    "downloadableReportsDesc": "Exporta PDFs con salidas de modelos y mapas de calor.",
+    "enterpriseContact": "¿Necesitas funciones empresariales? Contacta ventas →",
+    "proMonthly": "Pro — Mensual",
+    "proYearly": "Pro — Anual",
+    "billedMonthly": "Facturado mensualmente, cancela en cualquier momento",
+    "bestValue": "Mejor valor — ahorra 20%",
+    "perMonth": "por mes",
+    "perYear": "por año",
+    "features": {
+      "priority": "Procesamiento prioritario",
+      "uploads25": "25 cargas / mes",
+      "uploads300": "300 cargas / año",
+      "pdfReports": "Informes PDF descargables",
+      "emailSupport": "Soporte por correo",
+      "prioritySupport": "Soporte prioritario por correo"
+    },
+    "startPro": "Comenzar Pro",
+    "startYearly": "Comenzar Anual",
+    "redirecting": "Redirigiendo…",
+    "faq": "Preguntas frecuentes",
+    "cancelAnytime": "¿Puedo cancelar en cualquier momento?",
+    "cancelAnswer": "Sí — los planes mensuales se pueden cancelar desde tu página de cuenta sin penalizaciones.",
+    "teamPlans": "¿Ofrecen planes para equipos o empresas?",
+    "teamPlansAnswer": "Sí — contacta a nuestro equipo de ventas a través de la página de Soporte para un plan personalizado."
+  },
+  "support": {
+    "title": "Centro de Soporte y Ayuda",
+    "subtitle": "Estamos aquí para ayudar. Envía un ticket a continuación o navega por la documentación y preguntas frecuentes.",
+    "contactSupport": "Contactar Soporte",
+    "name": "Nombre",
+    "namePlaceholder": "Tu nombre (opcional)",
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "tu@dominio.com",
+    "message": "Mensaje",
+    "messagePlaceholder": "Describe el problema o solicitud",
+    "sendMessage": "Enviar Mensaje",
+    "sending": "Enviando...",
+    "success": "Gracias — responderemos pronto.",
+    "error": "Error al enviar mensaje. Por favor, inténtalo de nuevo.",
+    "quickResources": "Recursos rápidos",
+    "documentation": "Documentación",
+    "faq": "Preguntas Frecuentes",
+    "billingPlans": "Facturación y Planes",
+    "officeHours": "Horario de oficina",
+    "officeHoursTime": "Lun–Vie, 09:00–18:00 UTC"
+  }
+}

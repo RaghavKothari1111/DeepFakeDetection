@@ -1,5 +1,7 @@
 import Head from "next/head";
 import dynamic from "next/dynamic";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 import ConsensusCard from "../../src/components/ConsensusCard";
 import ModelResultCard from "../../src/components/ModelResultCard";
 import useSWR from "swr";
@@ -13,7 +15,16 @@ import { RefreshCw, Download, Loader2 } from "lucide-react";
 import { useState } from "react";
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
 
+export async function getServerSideProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "en", ["common"])),
+    },
+  };
+}
+
 export default function ResultPage() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const { id } = router.query;
   const [isRerunning, setIsRerunning] = useState(false);
@@ -55,17 +66,17 @@ export default function ResultPage() {
       
       if (!response.ok) {
         const error = await response.json();
-        alert(`Failed to re-run analysis: ${error.detail || "Unknown error"}`);
+        alert(`${t("result.rerunFailed")}: ${error.detail || t("result.rerunError")}`);
         return;
       }
       
       // Immediately refresh the job data to show pending status
       await mutate();
       // Show success message
-      alert("Analysis re-run started! The page will update automatically.");
+      alert(t("result.rerunStarted"));
     } catch (err) {
       console.error("Error re-running analysis:", err);
-      alert("Failed to re-run analysis. Please try again.");
+      alert(t("result.rerunError"));
     } finally {
       setIsRerunning(false);
     }
@@ -93,7 +104,7 @@ export default function ResultPage() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="pt-16 max-w-4xl mx-auto px-4 py-12 text-center">
-          <p className="text-muted-foreground">Job not found.</p>
+          <p className="text-muted-foreground">{t("result.jobNotFound")}</p>
         </main>
       </div>
     );
@@ -109,7 +120,7 @@ export default function ResultPage() {
 
       <main className="pt-16 max-w-7xl mx-auto px-4 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Analysis Results</h1>
+          <h1 className="text-3xl font-bold mb-2">{t("result.title")}</h1>
           <p className="text-muted-foreground">{job.job_id}</p>
         </div>
 
@@ -125,7 +136,7 @@ export default function ResultPage() {
             {/* Per-model breakdown */}
             <section>
               <h3 className="text-2xl font-semibold mb-5">
-                Per-Model Breakdown
+                {t("result.perModelBreakdown")}
               </h3>
 
               <div className="grid md:grid-cols-2 gap-6">
@@ -142,7 +153,7 @@ export default function ResultPage() {
             <Card className="p-3">
               <img
                 src={job.image?.thumbnail_url}
-                alt="Analyzed Image"
+                alt={t("result.analyzedImage")}
                 className="rounded-md w-full"
               />
             </Card>
@@ -158,27 +169,27 @@ export default function ResultPage() {
                 {isRerunning ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Re-running...
+                    {t("result.rerunning")}
                   </>
                 ) : (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    Re-run Analysis
+                    {t("result.rerunAnalysis")}
                   </>
                 )}
               </Button>
 
               <Button variant="outline" className="w-full">
                 <Download className="h-4 w-4 mr-2" />
-                Download PDF
+                {t("result.downloadPdf")}
               </Button>
             </div>
 
             {/* Details */}
             <Card className="p-5">
-              <h4 className="font-semibold mb-1">Details</h4>
+              <h4 className="font-semibold mb-1">{t("result.details")}</h4>
               <p className="text-sm text-muted-foreground">
-                Uploaded: {new Date(job.created_at).toLocaleString()}
+                {t("result.uploaded")}: {new Date(job.created_at).toLocaleString()}
               </p>
             </Card>
           </aside>

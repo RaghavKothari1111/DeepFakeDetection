@@ -1,0 +1,230 @@
+{
+  "navbar": {
+    "title": "DeepVerify",
+    "dashboard": "Dashboard",
+    "membership": "Membership",
+    "support": "Support",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out"
+  },
+  "home": {
+    "title": "Multi-Model Deepfake Detection",
+    "subtitle": "Professional authenticity analysis using 5 advanced AI models. Get detailed reports with heatmap visualizations and confidence scores.",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "trustedBy": "Trusted by researchers",
+    "accuracy": "99.2% accuracy",
+    "secure": "Secure & private",
+    "tryItNow": "Try It Now",
+    "tryItDescription": "Upload an image to see how our detection pipeline works.",
+    "signInToSave": "Sign in to save your analysis history and unlock more features.",
+    "powerfulFeatures": "Powerful Features",
+    "featuresSubtitle": "Everything you need for professional deepfake detection.",
+    "readyToVerify": "Ready to verify authenticity?",
+    "readyDescription": "Join thousands of researchers, journalists, and security professionals using DeepVerify.",
+    "signInToGetStarted": "Sign In to Get Started",
+    "footer": "© 2025 DeepVerify. Professional deepfake detection platform.",
+    "features": {
+      "modelPipeline": {
+        "title": "5-Model AI Pipeline",
+        "description": "Multiple state-of-the-art detection models analyze your image simultaneously."
+      },
+      "heatmap": {
+        "title": "Heatmap Visualization",
+        "description": "Interactive heatmaps show exactly where models detect manipulation."
+      },
+      "accuracy": {
+        "title": "High Accuracy",
+        "description": "Ensemble model approach achieves industry-leading detection accuracy."
+      },
+      "fast": {
+        "title": "Fast Processing",
+        "description": "Optimized inference pipeline returns results in seconds."
+      },
+      "secure": {
+        "title": "Secure & Private",
+        "description": "All images processed locally and protected with strict privacy standards."
+      },
+      "downloadable": {
+        "title": "Downloadable Reports",
+        "description": "Export full reconstruction and report data in PDF format."
+      }
+    }
+  },
+  "upload": {
+    "title": "Upload an image to analyze",
+    "description": "Drag and drop your image here, or click to browse",
+    "supported": "Supports JPG, PNG • Max 10MB",
+    "chooseFile": "Choose file",
+    "analyzing": "Analyzing…",
+    "uploadAnalyze": "Upload & Analyze",
+    "selectFileFirst": "Select a file first",
+    "onlyJpegPng": "Only JPEG and PNG allowed",
+    "maxFileSize": "Max file size is 10MB",
+    "uploadSucceeded": "Upload succeeded but server response was unexpected.",
+    "uploadFailed": "Upload failed",
+    "notSignedIn": "You are not signed in. You can still upload, but some features may require an account.",
+    "logIn": "Log in",
+    "goToLogin": "Go to Login →",
+    "supportedFormats": "Supported: JPG, PNG — max 10MB. By uploading you agree to our terms."
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to your account",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "signingIn": "Signing in...",
+    "signIn": "Sign In",
+    "loginFailed": "Login failed",
+    "noAccount": "Don't have an account?",
+    "createOne": "Create one"
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Sign up to get started",
+    "username": "Username",
+    "usernamePlaceholder": "Choose a username",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Create a password (min 6 characters)",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "creatingAccount": "Creating account...",
+    "createAccount": "Create Account",
+    "passwordsNoMatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "registrationFailed": "Registration failed",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
+  "dashboard": {
+    "title": "Analysis History",
+    "subtitle": "Your recent deepfake detection analyses",
+    "newAnalysis": "New Analysis",
+    "noAnalyses": "No analyses yet",
+    "noAnalysesDescription": "Upload your first image to start detecting deepfakes with our multi-model analysis pipeline.",
+    "uploadImage": "Upload Image"
+  },
+  "result": {
+    "title": "Analysis Results",
+    "perModelBreakdown": "Per-Model Breakdown",
+    "analyzedImage": "Analyzed Image",
+    "rerunAnalysis": "Re-run Analysis",
+    "rerunning": "Re-running...",
+    "downloadPdf": "Download PDF",
+    "details": "Details",
+    "uploaded": "Uploaded",
+    "jobNotFound": "Job not found.",
+    "rerunFailed": "Failed to re-run analysis",
+    "rerunStarted": "Analysis re-run started! The page will update automatically.",
+    "rerunError": "Failed to re-run analysis. Please try again."
+  },
+  "language": {
+    "selectLanguage": "Select Language",
+    "chooseLanguage": "Choose your preferred language",
+    "continue": "Continue",
+    "english": "English",
+    "spanish": "Spanish",
+    "french": "French",
+    "german": "German",
+    "hindi": "Hindi",
+    "chinese": "Chinese",
+    "japanese": "Japanese",
+    "arabic": "Arabic"
+  },
+  "consensus": {
+    "likelyAuthentic": "Likely Authentic",
+    "likelyManipulated": "Likely Manipulated",
+    "uncertain": "Uncertain",
+    "finalVerdict": "Final verdict based on multiple detection models",
+    "confidenceScore": "Confidence Score",
+    "keyFindings": "Key Findings"
+  },
+  "model": {
+    "execution": "ms execution",
+    "confidence": "Confidence",
+    "heatmapAnalysis": "Heatmap Analysis",
+    "original": "Original",
+    "heatmapOverlay": "Heatmap overlay",
+    "overlayOpacity": "Overlay Opacity",
+    "modelNotes": "Model Notes:"
+  },
+  "loggedIn": {
+    "quickVerify": "Quick Verify — Upload an image to start analysis",
+    "quickVerifyDescription": "Fast, explainable, multi-model authenticity checks. Your uploads are private and processed quickly.",
+    "uploadAnalyze": "Upload & Analyze",
+    "uploadDescription": "Drag & drop an image (PNG, JPG). Results include a consensus verdict, confidence scores, and heatmaps.",
+    "uploadImage": "Upload Image",
+    "viewHistory": "View History",
+    "quickActions": "Quick Actions",
+    "viewDashboard": "View Dashboard",
+    "openSampleReport": "Open Sample Report",
+    "recentAnalyses": "Recent Analyses",
+    "viewAllAnalyses": "View all analyses →",
+    "securePrivate": "Secure & Private",
+    "analysisEncrypted": "Analysis encrypted in transit",
+    "needHelp": "Need help interpreting a result?",
+    "contactSupport": "Contact our research team for deeper analysis and consulting.",
+    "contactSupportButton": "Contact Support"
+  },
+  "membership": {
+    "title": "Membership plans for professionals",
+    "subtitle": "Unlock priority processing, batch uploads, and downloadable reports. Select a plan that fits your team's needs.",
+    "whyUpgrade": "Why upgrade?",
+    "priorityProcessing": "Priority processing",
+    "priorityProcessingDesc": "Shorter queue times for time-sensitive analysis.",
+    "batchUploads": "Batch uploads",
+    "batchUploadsDesc": "Process multiple images simultaneously.",
+    "downloadableReports": "Downloadable reports",
+    "downloadableReportsDesc": "Export PDFs with model outputs and heatmaps.",
+    "enterpriseContact": "Need enterprise features? Contact sales →",
+    "proMonthly": "Pro — Monthly",
+    "proYearly": "Pro — Yearly",
+    "billedMonthly": "Billed monthly, cancel anytime",
+    "bestValue": "Best value — save 20%",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "features": {
+      "priority": "Priority processing",
+      "uploads25": "25 uploads / month",
+      "uploads300": "300 uploads / year",
+      "pdfReports": "Downloadable PDF reports",
+      "emailSupport": "Email support",
+      "prioritySupport": "Priority email support"
+    },
+    "startPro": "Start Pro",
+    "startYearly": "Start Yearly",
+    "redirecting": "Redirecting…",
+    "faq": "Frequently asked questions",
+    "cancelAnytime": "Can I cancel anytime?",
+    "cancelAnswer": "Yes — monthly plans can be cancelled from your account page without penalties.",
+    "teamPlans": "Do you offer team or enterprise plans?",
+    "teamPlansAnswer": "Yes — contact our sales team via the Support page for a tailored plan."
+  },
+  "support": {
+    "title": "Support & Help Center",
+    "subtitle": "We're here to help. Submit a ticket below or browse documentation and FAQs.",
+    "contactSupport": "Contact Support",
+    "name": "Name",
+    "namePlaceholder": "Your name (optional)",
+    "email": "Email",
+    "emailPlaceholder": "you@domain.com",
+    "message": "Message",
+    "messagePlaceholder": "Describe the issue or request",
+    "sendMessage": "Send Message",
+    "sending": "Sending...",
+    "success": "Thank you — we will reply soon.",
+    "error": "Error sending message. Please try again.",
+    "quickResources": "Quick resources",
+    "documentation": "Documentation",
+    "faq": "FAQ",
+    "billingPlans": "Billing & Plans",
+    "officeHours": "Office hours",
+    "officeHoursTime": "Mon–Fri, 09:00–18:00 UTC"
+  }
+}
+

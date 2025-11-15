@@ -1,22 +1,28 @@
+# Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# Next.js
-.next/
-*.pack.gz
-.cache/
+# Virtual environment (should not be in repo)
+venv/
+env/
+.venv
 
-# Your project's heavy outputs
-backend/data/heatmaps/
-data/heatmaps/
-data/uploads/
+# Database files
+*.db
+*.sqlite
+*.sqlite3
 
-# Model files (too large for git)
-*.keras
-*.h5
-*.pt
-*.pth
-*.pkl
-*.pb
-*.onnx
-*.tflite
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local

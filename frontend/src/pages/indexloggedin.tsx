@@ -1,6 +1,8 @@
 // pages/indexloggedin.tsx
 import Head from "next/head";
 import dynamic from "next/dynamic";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 import UploadCard from "@/components/UploadCard";
 import FeatureCard from "@/components/FeatureCard";
 import { Button } from "@/components/ui/button";
@@ -8,37 +10,46 @@ import { Layers, Flame, Zap, Shield, Lock, FileDown } from "lucide-react";
 
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
 
+export async function getServerSideProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "en", ["common"])),
+    },
+  };
+}
+
 export default function LoggedInHome() {
+  const { t } = useTranslation("common");
   const features = [
     {
       icon: Layers,
-      title: "5-Model AI Pipeline",
-      description: "Multiple state-of-the-art detection models analyze your image simultaneously.",
+      title: t("home.features.modelPipeline.title"),
+      description: t("home.features.modelPipeline.description"),
     },
     {
       icon: Flame,
-      title: "Heatmap Visualization",
-      description: "Interactive heatmaps show exactly where models detect manipulation.",
+      title: t("home.features.heatmap.title"),
+      description: t("home.features.heatmap.description"),
     },
     {
       icon: Zap,
-      title: "High Accuracy",
-      description: "Ensemble model approach achieves industry-leading detection accuracy.",
+      title: t("home.features.accuracy.title"),
+      description: t("home.features.accuracy.description"),
     },
     {
       icon: Zap,
-      title: "Fast Processing",
-      description: "Optimized inference pipeline returns results in seconds.",
+      title: t("home.features.fast.title"),
+      description: t("home.features.fast.description"),
     },
     {
       icon: Lock,
-      title: "Secure & Private",
-      description: "All images processed and stored with strict privacy controls.",
+      title: t("home.features.secure.title"),
+      description: t("loggedIn.securePrivate"),
     },
     {
       icon: FileDown,
-      title: "Downloadable Reports",
-      description: "Export full reconstruction and model outputs as PDF.",
+      title: t("home.features.downloadable.title"),
+      description: t("home.features.downloadable.description"),
     },
   ];
 
@@ -60,10 +71,10 @@ export default function LoggedInHome() {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto text-center">
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                Quick Verify — Upload an image to start analysis
+                {t("loggedIn.quickVerify")}
               </h1>
               <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mt-3">
-                Fast, explainable, multi-model authenticity checks. Your uploads are private and processed quickly.
+                {t("loggedIn.quickVerifyDescription")}
               </p>
             </div>
           </div>
@@ -76,9 +87,9 @@ export default function LoggedInHome() {
               {/* Center column: wide Upload area (spans 2 cols on large screens) */}
               <div className="lg:col-span-2">
                 <div className="rounded-xl shadow-sm border border-gray-100 bg-white p-6">
-                  <h2 className="text-2xl font-semibold mb-4">Upload & Analyze</h2>
+                  <h2 className="text-2xl font-semibold mb-4">{t("loggedIn.uploadAnalyze")}</h2>
                   <p className="text-sm text-muted-foreground mb-6">
-                    Drag & drop an image (PNG, JPG). Results include a consensus verdict, confidence scores, and heatmaps.
+                    {t("loggedIn.uploadDescription")}
                   </p>
 
                   {/* UploadCard should implement the drag/drop UI + progress. Keep it wide and centered. */}
@@ -88,10 +99,10 @@ export default function LoggedInHome() {
 
                   <div className="mt-6 flex items-center gap-3 justify-center">
                     <Button size="lg" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-                      Upload Image
+                      {t("loggedIn.uploadImage")}
                     </Button>
                     <Button variant="outline" size="lg" onClick={() => window.location.href = "/dashboard"}>
-                      View History
+                      {t("loggedIn.viewHistory")}
                     </Button>
                   </div>
                 </div>
@@ -107,7 +118,7 @@ export default function LoggedInHome() {
               {/* Right column: extras / quick actions / recent analyses */}
               <aside className="lg:col-span-1">
                 <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sticky top-24">
-                  <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
+                  <h3 className="text-lg font-semibold mb-3">{t("loggedIn.quickActions")}</h3>
 
                   <div className="flex flex-col gap-3">
                     <button
@@ -115,7 +126,7 @@ export default function LoggedInHome() {
                       className="w-full text-left px-4 py-3 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition"
                       aria-label="Upload image"
                     >
-                      Upload Image
+                      {t("loggedIn.uploadImage")}
                     </button>
 
                     <button
@@ -123,7 +134,7 @@ export default function LoggedInHome() {
                       className="w-full text-left px-4 py-3 border rounded-lg hover:shadow-sm transition"
                       aria-label="View dashboard"
                     >
-                      View Dashboard
+                      {t("loggedIn.viewDashboard")}
                     </button>
 
                     <button
@@ -131,12 +142,12 @@ export default function LoggedInHome() {
                       className="w-full text-left px-4 py-3 border rounded-lg hover:shadow-sm transition"
                       aria-label="Sample report"
                     >
-                      Open Sample Report
+                      {t("loggedIn.openSampleReport")}
                     </button>
                   </div>
 
                   <div className="mt-6 border-t pt-4">
-                    <h4 className="text-sm font-medium uppercase tracking-wide mb-3">Recent Analyses</h4>
+                    <h4 className="text-sm font-medium uppercase tracking-wide mb-3">{t("loggedIn.recentAnalyses")}</h4>
 
                     {/* Placeholder list — replace with real data */}
                     <ul className="space-y-3">
@@ -169,7 +180,7 @@ export default function LoggedInHome() {
 
                     <div className="mt-4">
                       <a href="/dashboard" className="text-sm text-primary hover:underline">
-                        View all analyses →
+                        {t("loggedIn.viewAllAnalyses")}
                       </a>
                     </div>
                   </div>
@@ -180,8 +191,8 @@ export default function LoggedInHome() {
                   <div className="flex items-center gap-3">
                     <Shield className="h-5 w-5 text-primary" />
                     <div>
-                      <div className="text-sm font-medium">Secure & Private</div>
-                      <div className="text-xs text-muted-foreground">Analysis encrypted in transit</div>
+                      <div className="text-sm font-medium">{t("loggedIn.securePrivate")}</div>
+                      <div className="text-xs text-muted-foreground">{t("loggedIn.analysisEncrypted")}</div>
                     </div>
                   </div>
                 </div>
@@ -194,11 +205,11 @@ export default function LoggedInHome() {
         <section className="py-12">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="rounded-xl border bg-white p-6 text-center">
-              <h3 className="text-xl font-semibold mb-2">Need help interpreting a result?</h3>
-              <p className="text-sm text-muted-foreground mb-4">Contact our research team for deeper analysis and consulting.</p>
+              <h3 className="text-xl font-semibold mb-2">{t("loggedIn.needHelp")}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{t("loggedIn.contactSupport")}</p>
               <div className="flex items-center justify-center gap-3">
-                <Button onClick={() => (window.location.href = "/support")}>Contact Support</Button>
-                <Button variant="outline" onClick={() => (window.location.href = "/dashboard")}>View History</Button>
+                <Button onClick={() => (window.location.href = "/support")}>{t("loggedIn.contactSupportButton")}</Button>
+                <Button variant="outline" onClick={() => (window.location.href = "/dashboard")}>{t("loggedIn.viewHistory")}</Button>
               </div>
             </div>
           </div>

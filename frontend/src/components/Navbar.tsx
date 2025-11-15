@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 
 import { getAuthToken, getCurrentUser, logout as apiLogout } from "@/lib/api";
 
@@ -17,7 +18,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Shield, LogOut, LayoutDashboard } from "lucide-react";
+import { Shield, LogOut, LayoutDashboard, Globe, Check } from "lucide-react";
+
+const LANGUAGES = [
+  { code: "en", name: "English", nativeName: "English" },
+  { code: "es", name: "Spanish", nativeName: "Español" },
+  { code: "fr", name: "French", nativeName: "Français" },
+  { code: "de", name: "German", nativeName: "Deutsch" },
+  { code: "hi", name: "Hindi", nativeName: "हिंदी" },
+  { code: "zh", name: "Chinese", nativeName: "中文" },
+  { code: "ja", name: "Japanese", nativeName: "日本語" },
+  { code: "ar", name: "Arabic", nativeName: "العربية" },
+];
 
 interface User {
   firstName?: string | null;
@@ -31,6 +43,8 @@ const AUTH_TOKEN_KEY = "auth_token"; // keep in sync with lib/api.ts if key name
 
 export default function Navbar() {
   const router = useRouter();
+  const { t, i18n } = useTranslation("common");
+  const [currentLocale, setCurrentLocale] = useState<string>(router.locale || "en");
 
   // Synchronous initial state from localStorage/token -> makes UI optimistic/immediate
   const [signedIn, setSignedIn] = useState<boolean>(() => {
@@ -149,6 +163,33 @@ export default function Navbar() {
     }
   };
 
+  // Update locale when router locale changes
+  useEffect(() => {
+    if (router.locale) {
+      setCurrentLocale(router.locale);
+    }
+  }, [router.locale]);
+
+  const handleLanguageChange = async (locale: string) => {
+    setCurrentLocale(locale);
+    // Save to localStorage
+    if (typeof window !== "undefined") {
+      localStorage.setItem("preferred_language", locale);
+    }
+    // Change language using router - this will trigger getServerSideProps with new locale
+    try {
+      await router.push(router.asPath, router.asPath, { locale, scroll: false });
+      // Wait a bit for router to update, then reload
+      setTimeout(() => {
+        window.location.reload();
+      }, 200);
+    } catch (error) {
+      console.error("Language change error:", error);
+      // Fallback: direct reload with locale in URL
+      window.location.href = `/${locale}${router.asPath}`;
+    }
+  };
+
   // Small UI helpers
   const displayName = user
     ? user.firstName && user.lastName
@@ -165,38 +206,67 @@ export default function Navbar() {
       </Link>
 
       <div className="flex items-center gap-4">
+        {/* Language Selector Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="gap-2">
+              <Globe className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {LANGUAGES.find(l => l.code === currentLocale)?.nativeName || "English"}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {LANGUAGES.map((lang) => (
+              <DropdownMenuItem
+                key={lang.code}
+                onClick={() => handleLanguageChange(lang.code)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">{lang.nativeName}</span>
+                  <span className="text-xs text-muted-foreground">{lang.name}</span>
+                </div>
+                {currentLocale === lang.code && (
+                  <Check className="h-4 w-4 text-primary" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {signedIn ? (
           <>
             <Link href="/dashboard">
-              <span className="hover:text-indigo-600 cursor-pointer">Dashboard</span>
+              <span className="hover:text-indigo-600 cursor-pointer">{t("navbar.dashboard")}</span>
             </Link>
 
             <Link href="/membership">
-              <span className="hover:text-indigo-600 cursor-pointer">Membership</span>
+              <span className="hover:text-indigo-600 cursor-pointer">{t("navbar.membership")}</span>
             </Link>
 
             <Link href="/support">
-              <span className="hover:text-indigo-600 cursor-pointer">Support</span>
+              <span className="hover:text-indigo-600 cursor-pointer">{t("navbar.support")}</span>
             </Link>
 
             <button
               onClick={handleLogout}
               className="px-3 py-2 bg-red-50 text-red-700 rounded hover:bg-red-100"
             >
-              Sign Out
+              {t("navbar.signOut")}
             </button>
           </>
         ) : (
           <>
             <Button asChild data-testid="button-signin">
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">{t("navbar.signIn")}</Link>
             </Button>
 
             <Link
               href="/register"
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded hover:bg-slate-200"
             >
-              Sign Up
+              {t("navbar.signUp")}
             </Link>
           </>
         )}

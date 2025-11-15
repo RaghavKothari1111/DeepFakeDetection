@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+env/
+ENV/
+.venv
+
+# Node.js
+node_modules/
+.next/
+out/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+*.tsbuildinfo
+*.pack.gz
+.cache/
+
+# Data directories (user uploads and generated files)
+data/
+backend/data/
+frontend/.next/
+
+# Model files (too large for git)
+*.keras
+*.h5
+*.pt
+*.pth
+*.pkl
+*.pb
+*.onnx
+*.tflite
+
+# OS
+Thumbs.db
+.DS_Store
+

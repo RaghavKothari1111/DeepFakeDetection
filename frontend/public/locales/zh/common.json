@@ -1,0 +1,229 @@
+{
+  "navbar": {
+    "title": "DeepVerify",
+    "dashboard": "仪表板",
+    "membership": "会员",
+    "support": "支持",
+    "signIn": "登录",
+    "signUp": "注册",
+    "signOut": "退出"
+  },
+  "home": {
+    "title": "多模型深度伪造检测",
+    "subtitle": "使用5个先进AI模型进行专业真实性分析。获取包含热图可视化和置信度分数的详细报告。",
+    "getStarted": "开始使用",
+    "learnMore": "了解更多",
+    "trustedBy": "研究人员信赖",
+    "accuracy": "99.2%准确率",
+    "secure": "安全且私密",
+    "tryItNow": "立即试用",
+    "tryItDescription": "上传图片以查看我们的检测流程如何工作。",
+    "signInToSave": "登录以保存您的分析历史并解锁更多功能。",
+    "powerfulFeatures": "强大功能",
+    "featuresSubtitle": "专业深度伪造检测所需的一切。",
+    "readyToVerify": "准备验证真实性？",
+    "readyDescription": "加入数千名使用DeepVerify的研究人员、记者和安全专业人员。",
+    "signInToGetStarted": "登录开始",
+    "footer": "© 2025 DeepVerify。专业深度伪造检测平台。",
+    "features": {
+      "modelPipeline": {
+        "title": "5模型AI流程",
+        "description": "多个最先进的检测模型同时分析您的图片。"
+      },
+      "heatmap": {
+        "title": "热图可视化",
+        "description": "交互式热图准确显示模型检测到操作的位置。"
+      },
+      "accuracy": {
+        "title": "高准确率",
+        "description": "集成模型方法达到行业领先的检测准确率。"
+      },
+      "fast": {
+        "title": "快速处理",
+        "description": "优化的推理流程在几秒钟内返回结果。"
+      },
+      "secure": {
+        "title": "安全且私密",
+        "description": "所有图片在本地处理，并受到严格隐私标准的保护。"
+      },
+      "downloadable": {
+        "title": "可下载报告",
+        "description": "以PDF格式导出完整的重建和报告数据。"
+      }
+    }
+  },
+  "upload": {
+    "title": "上传图片进行分析",
+    "description": "将图片拖放到此处，或点击浏览",
+    "supported": "支持JPG、PNG • 最大10MB",
+    "chooseFile": "选择文件",
+    "analyzing": "分析中…",
+    "uploadAnalyze": "上传并分析",
+    "selectFileFirst": "请先选择文件",
+    "onlyJpegPng": "仅允许JPEG和PNG",
+    "maxFileSize": "最大文件大小为10MB",
+    "uploadSucceeded": "上传成功，但服务器响应意外。",
+    "uploadFailed": "上传失败",
+    "notSignedIn": "您未登录。您仍可以上传，但某些功能可能需要账户。",
+    "logIn": "登录",
+    "goToLogin": "前往登录 →",
+    "supportedFormats": "支持：JPG、PNG — 最大10MB。上传即表示您同意我们的条款。"
+  },
+  "login": {
+    "title": "欢迎回来",
+    "subtitle": "登录您的账户",
+    "username": "用户名",
+    "usernamePlaceholder": "输入您的用户名",
+    "password": "密码",
+    "passwordPlaceholder": "输入您的密码",
+    "signingIn": "登录中...",
+    "signIn": "登录",
+    "loginFailed": "登录失败",
+    "noAccount": "没有账户？",
+    "createOne": "创建一个"
+  },
+  "register": {
+    "title": "创建账户",
+    "subtitle": "注册以开始",
+    "username": "用户名",
+    "usernamePlaceholder": "选择一个用户名",
+    "email": "电子邮件",
+    "emailPlaceholder": "输入您的电子邮件",
+    "password": "密码",
+    "passwordPlaceholder": "创建密码（最少6个字符）",
+    "confirmPassword": "确认密码",
+    "confirmPasswordPlaceholder": "确认您的密码",
+    "creatingAccount": "创建账户中...",
+    "createAccount": "创建账户",
+    "passwordsNoMatch": "密码不匹配",
+    "passwordTooShort": "密码必须至少6个字符",
+    "registrationFailed": "注册失败",
+    "haveAccount": "已有账户？",
+    "signIn": "登录"
+  },
+  "dashboard": {
+    "title": "分析历史",
+    "subtitle": "您最近的深度伪造检测分析",
+    "newAnalysis": "新分析",
+    "noAnalyses": "尚无分析",
+    "noAnalysesDescription": "上传您的第一张图片，开始使用我们的多模型分析流程检测深度伪造。",
+    "uploadImage": "上传图片"
+  },
+  "result": {
+    "title": "分析结果",
+    "perModelBreakdown": "按模型细分",
+    "analyzedImage": "已分析图片",
+    "rerunAnalysis": "重新运行分析",
+    "rerunning": "重新运行中...",
+    "downloadPdf": "下载PDF",
+    "details": "详细信息",
+    "uploaded": "已上传",
+    "jobNotFound": "未找到任务。",
+    "rerunFailed": "重新运行分析失败",
+    "rerunStarted": "分析重新运行已开始！页面将自动更新。",
+    "rerunError": "重新运行分析失败。请重试。"
+  },
+  "language": {
+    "selectLanguage": "选择语言",
+    "chooseLanguage": "选择您的首选语言",
+    "continue": "继续",
+    "english": "英语",
+    "spanish": "西班牙语",
+    "french": "法语",
+    "german": "德语",
+    "hindi": "印地语",
+    "chinese": "中文",
+    "japanese": "日语",
+    "arabic": "阿拉伯语"
+  },
+  "consensus": {
+    "likelyAuthentic": "可能真实",
+    "likelyManipulated": "可能被操纵",
+    "uncertain": "不确定",
+    "finalVerdict": "基于多个检测模型的最终判定",
+    "confidenceScore": "置信度分数",
+    "keyFindings": "关键发现"
+  },
+  "model": {
+    "execution": "毫秒执行",
+    "confidence": "置信度",
+    "heatmapAnalysis": "热图分析",
+    "original": "原始",
+    "heatmapOverlay": "热图叠加",
+    "overlayOpacity": "叠加不透明度",
+    "modelNotes": "模型注释："
+  },
+  "loggedIn": {
+    "quickVerify": "快速验证 — 上传图片开始分析",
+    "quickVerifyDescription": "快速、可解释的多模型真实性检查。您的上传是私密的，处理迅速。",
+    "uploadAnalyze": "上传并分析",
+    "uploadDescription": "拖放图片（PNG、JPG）。结果包括共识判定、置信度分数和热图。",
+    "uploadImage": "上传图片",
+    "viewHistory": "查看历史",
+    "quickActions": "快速操作",
+    "viewDashboard": "查看仪表板",
+    "openSampleReport": "打开示例报告",
+    "recentAnalyses": "最近的分析",
+    "viewAllAnalyses": "查看所有分析 →",
+    "securePrivate": "安全且私密",
+    "analysisEncrypted": "传输中加密的分析",
+    "needHelp": "需要帮助解释结果？",
+    "contactSupport": "联系我们的研究团队进行更深入的分析和咨询。",
+    "contactSupportButton": "联系支持"
+  },
+  "membership": {
+    "title": "专业会员计划",
+    "subtitle": "解锁优先处理、批量上传和可下载报告。选择适合您团队需求的计划。",
+    "whyUpgrade": "为什么要升级？",
+    "priorityProcessing": "优先处理",
+    "priorityProcessingDesc": "缩短时间敏感分析的队列时间。",
+    "batchUploads": "批量上传",
+    "batchUploadsDesc": "同时处理多张图片。",
+    "downloadableReports": "可下载报告",
+    "downloadableReportsDesc": "导出包含模型输出和热图的PDF。",
+    "enterpriseContact": "需要企业功能？联系销售 →",
+    "proMonthly": "专业版 — 月度",
+    "proYearly": "专业版 — 年度",
+    "billedMonthly": "按月计费，随时取消",
+    "bestValue": "最佳价值 — 节省20%",
+    "perMonth": "每月",
+    "perYear": "每年",
+    "features": {
+      "priority": "优先处理",
+      "uploads25": "25次上传 / 月",
+      "uploads300": "300次上传 / 年",
+      "pdfReports": "可下载PDF报告",
+      "emailSupport": "电子邮件支持",
+      "prioritySupport": "优先电子邮件支持"
+    },
+    "startPro": "开始专业版",
+    "startYearly": "开始年度",
+    "redirecting": "重定向中…",
+    "faq": "常见问题",
+    "cancelAnytime": "我可以随时取消吗？",
+    "cancelAnswer": "可以 — 月度计划可以从您的账户页面取消，无需支付违约金。",
+    "teamPlans": "你们提供团队或企业计划吗？",
+    "teamPlansAnswer": "是的 — 通过支持页面联系我们的销售团队，获取定制计划。"
+  },
+  "support": {
+    "title": "支持与帮助中心",
+    "subtitle": "我们随时为您提供帮助。请在下方提交工单或浏览文档和常见问题。",
+    "contactSupport": "联系支持",
+    "name": "姓名",
+    "namePlaceholder": "您的姓名（可选）",
+    "email": "电子邮件",
+    "emailPlaceholder": "you@domain.com",
+    "message": "消息",
+    "messagePlaceholder": "描述问题或请求",
+    "sendMessage": "发送消息",
+    "sending": "发送中...",
+    "success": "谢谢 — 我们会尽快回复。",
+    "error": "发送消息时出错。请重试。",
+    "quickResources": "快速资源",
+    "documentation": "文档",
+    "faq": "常见问题",
+    "billingPlans": "计费和计划",
+    "officeHours": "办公时间",
+    "officeHoursTime": "周一至周五，09:00–18:00 UTC"
+  }
+}

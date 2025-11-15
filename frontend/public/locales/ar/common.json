@@ -1,0 +1,229 @@
+{
+  "navbar": {
+    "title": "DeepVerify",
+    "dashboard": "لوحة التحكم",
+    "membership": "العضوية",
+    "support": "الدعم",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "signOut": "تسجيل الخروج"
+  },
+  "home": {
+    "title": "كشف التزييف العميق متعدد النماذج",
+    "subtitle": "تحليل احترافي للأصالة باستخدام 5 نماذج ذكاء اصطناعي متقدمة. احصل على تقارير مفصلة مع تصورات الخريطة الحرارية ودرجات الثقة.",
+    "getStarted": "ابدأ",
+    "learnMore": "اعرف المزيد",
+    "trustedBy": "موثوق به من قبل الباحثين",
+    "accuracy": "دقة 99.2%",
+    "secure": "آمن وخاص",
+    "tryItNow": "جربه الآن",
+    "tryItDescription": "قم برفع صورة لمعرفة كيفية عمل خط أنابيب الكشف لدينا.",
+    "signInToSave": "قم بتسجيل الدخول لحفظ تاريخ التحليل الخاص بك وإلغاء قفل المزيد من الميزات.",
+    "powerfulFeatures": "ميزات قوية",
+    "featuresSubtitle": "كل ما تحتاجه لاكتشاف التزييف العميق الاحترافي.",
+    "readyToVerify": "هل أنت مستعد للتحقق من الأصالة؟",
+    "readyDescription": "انضم إلى آلاف الباحثين والصحفيين ومتخصصي الأمن الذين يستخدمون DeepVerify.",
+    "signInToGetStarted": "سجل الدخول للبدء",
+    "footer": "© 2025 DeepVerify. منصة احترافية لاكتشاف التزييف العميق.",
+    "features": {
+      "modelPipeline": {
+        "title": "خط أنابيب ذكاء اصطناعي بخمسة نماذج",
+        "description": "تحلل نماذج الكشف المتطورة المتعددة صورتك في وقت واحد."
+      },
+      "heatmap": {
+        "title": "تصور الخريطة الحرارية",
+        "description": "تظهر الخرائط الحرارية التفاعلية بالضبط أين تكتشف النماذج التلاعب."
+      },
+      "accuracy": {
+        "title": "دقة عالية",
+        "description": "يحقق نهج النموذج المجمع دقة كشف رائدة في الصناعة."
+      },
+      "fast": {
+        "title": "معالجة سريعة",
+        "description": "يعيد خط أنابيب الاستدلال المحسّن النتائج في ثوانٍ."
+      },
+      "secure": {
+        "title": "آمن وخاص",
+        "description": "يتم معالجة جميع الصور محليًا ومحمية بمعايير خصوصية صارمة."
+      },
+      "downloadable": {
+        "title": "تقارير قابلة للتنزيل",
+        "description": "قم بتصدير بيانات إعادة البناء والتقرير الكاملة بتنسيق PDF."
+      }
+    }
+  },
+  "upload": {
+    "title": "قم برفع صورة للتحليل",
+    "description": "اسحب وأفلت صورتك هنا، أو انقر للتصفح",
+    "supported": "يدعم JPG و PNG • الحد الأقصى 10MB",
+    "chooseFile": "اختر ملف",
+    "analyzing": "جارٍ التحليل…",
+    "uploadAnalyze": "رفع وتحليل",
+    "selectFileFirst": "اختر ملفًا أولاً",
+    "onlyJpegPng": "يُسمح فقط بـ JPEG و PNG",
+    "maxFileSize": "الحد الأقصى لحجم الملف هو 10MB",
+    "uploadSucceeded": "نجح الرفع لكن استجابة الخادم كانت غير متوقعة.",
+    "uploadFailed": "فشل الرفع",
+    "notSignedIn": "لم تقم بتسجيل الدخول. لا يزال بإمكانك الرفع، لكن قد تتطلب بعض الميزات حسابًا.",
+    "logIn": "تسجيل الدخول",
+    "goToLogin": "انتقل إلى تسجيل الدخول →",
+    "supportedFormats": "مدعوم: JPG و PNG — الحد الأقصى 10MB. بالرفع أنت توافق على شروطنا."
+  },
+  "login": {
+    "title": "مرحبًا بعودتك",
+    "subtitle": "قم بتسجيل الدخول إلى حسابك",
+    "username": "اسم المستخدم",
+    "usernamePlaceholder": "أدخل اسم المستخدم الخاص بك",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور الخاصة بك",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "signIn": "تسجيل الدخول",
+    "loginFailed": "فشل تسجيل الدخول",
+    "noAccount": "ليس لديك حساب؟",
+    "createOne": "أنشئ واحدًا"
+  },
+  "register": {
+    "title": "إنشاء حساب",
+    "subtitle": "سجل للبدء",
+    "username": "اسم المستخدم",
+    "usernamePlaceholder": "اختر اسم مستخدم",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "أنشئ كلمة مرور (6 أحرف على الأقل)",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "confirmPasswordPlaceholder": "أكد كلمة المرور الخاصة بك",
+    "creatingAccount": "جارٍ إنشاء الحساب...",
+    "createAccount": "إنشاء حساب",
+    "passwordsNoMatch": "كلمات المرور غير متطابقة",
+    "passwordTooShort": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+    "registrationFailed": "فشل التسجيل",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "signIn": "تسجيل الدخول"
+  },
+  "dashboard": {
+    "title": "تاريخ التحليل",
+    "subtitle": "تحليلات اكتشاف التزييف العميق الأخيرة الخاصة بك",
+    "newAnalysis": "تحليل جديد",
+    "noAnalyses": "لا توجد تحليلات بعد",
+    "noAnalysesDescription": "قم برفع صورتك الأولى لبدء اكتشاف التزييف العميق باستخدام خط أنابيب التحليل متعدد النماذج لدينا.",
+    "uploadImage": "رفع صورة"
+  },
+  "result": {
+    "title": "نتائج التحليل",
+    "perModelBreakdown": "التفصيل حسب النموذج",
+    "analyzedImage": "الصورة المحللة",
+    "rerunAnalysis": "إعادة تشغيل التحليل",
+    "rerunning": "جارٍ إعادة التشغيل...",
+    "downloadPdf": "تنزيل PDF",
+    "details": "التفاصيل",
+    "uploaded": "تم الرفع",
+    "jobNotFound": "لم يتم العثور على المهمة.",
+    "rerunFailed": "فشل إعادة تشغيل التحليل",
+    "rerunStarted": "تم بدء إعادة تشغيل التحليل! ستتم تحديث الصفحة تلقائيًا.",
+    "rerunError": "فشل إعادة تشغيل التحليل. يرجى المحاولة مرة أخرى."
+  },
+  "language": {
+    "selectLanguage": "اختر اللغة",
+    "chooseLanguage": "اختر لغتك المفضلة",
+    "continue": "متابعة",
+    "english": "الإنجليزية",
+    "spanish": "الإسبانية",
+    "french": "الفرنسية",
+    "german": "الألمانية",
+    "hindi": "الهندية",
+    "chinese": "الصينية",
+    "japanese": "اليابانية",
+    "arabic": "العربية"
+  },
+  "consensus": {
+    "likelyAuthentic": "محتمل الأصالة",
+    "likelyManipulated": "محتمل التلاعب",
+    "uncertain": "غير مؤكد",
+    "finalVerdict": "الحكم النهائي بناءً على نماذج كشف متعددة",
+    "confidenceScore": "درجة الثقة",
+    "keyFindings": "النتائج الرئيسية"
+  },
+  "model": {
+    "execution": "تنفيذ بالمللي ثانية",
+    "confidence": "الثقة",
+    "heatmapAnalysis": "تحليل الخريطة الحرارية",
+    "original": "الأصلي",
+    "heatmapOverlay": "تراكب الخريطة الحرارية",
+    "overlayOpacity": "شفافية التراكب",
+    "modelNotes": "ملاحظات النموذج:"
+  },
+  "loggedIn": {
+    "quickVerify": "التحقق السريع — ارفع صورة لبدء التحليل",
+    "quickVerifyDescription": "فحوصات أصالة سريعة وقابلة للشرح ومتعددة النماذج. رفعاتك خاصة ومعالجة بسرعة.",
+    "uploadAnalyze": "رفع وتحليل",
+    "uploadDescription": "اسحب وأفلت صورة (PNG، JPG). تتضمن النتائج حكمًا بالإجماع ودرجات ثقة وخرائط حرارية.",
+    "uploadImage": "رفع صورة",
+    "viewHistory": "عرض التاريخ",
+    "quickActions": "إجراءات سريعة",
+    "viewDashboard": "عرض لوحة التحكم",
+    "openSampleReport": "فتح تقرير نموذجي",
+    "recentAnalyses": "التحليلات الأخيرة",
+    "viewAllAnalyses": "عرض جميع التحليلات →",
+    "securePrivate": "آمن وخاص",
+    "analysisEncrypted": "تحليل مشفر أثناء النقل",
+    "needHelp": "تحتاج مساعدة في تفسير النتيجة؟",
+    "contactSupport": "اتصل بفريق البحث لدينا للحصول على تحليل أعمق واستشارة.",
+    "contactSupportButton": "اتصل بالدعم"
+  },
+  "membership": {
+    "title": "خطط العضوية للمحترفين",
+    "subtitle": "افتح معالجة أولوية ورفعات مجمعة وتقارير قابلة للتنزيل. اختر خطة تناسب احتياجات فريقك.",
+    "whyUpgrade": "لماذا الترقية؟",
+    "priorityProcessing": "معالجة أولوية",
+    "priorityProcessingDesc": "أوقات انتظار أقصر للتحليل الحساس للوقت.",
+    "batchUploads": "رفعات مجمعة",
+    "batchUploadsDesc": "معالجة صور متعددة في وقت واحد.",
+    "downloadableReports": "تقارير قابلة للتنزيل",
+    "downloadableReportsDesc": "قم بتصدير ملفات PDF مع مخرجات النموذج والخرائط الحرارية.",
+    "enterpriseContact": "تحتاج ميزات المؤسسات؟ اتصل بالمبيعات →",
+    "proMonthly": "احترافي — شهري",
+    "proYearly": "احترافي — سنوي",
+    "billedMonthly": "فوترة شهرية، إلغاء في أي وقت",
+    "bestValue": "أفضل قيمة — وفر 20%",
+    "perMonth": "شهريًا",
+    "perYear": "سنويًا",
+    "features": {
+      "priority": "معالجة أولوية",
+      "uploads25": "25 رفع / شهر",
+      "uploads300": "300 رفع / سنة",
+      "pdfReports": "تقارير PDF قابلة للتنزيل",
+      "emailSupport": "دعم عبر البريد الإلكتروني",
+      "prioritySupport": "دعم بريد إلكتروني ذو أولوية"
+    },
+    "startPro": "ابدأ احترافي",
+    "startYearly": "ابدأ سنوي",
+    "redirecting": "جارٍ إعادة التوجيه…",
+    "faq": "الأسئلة الشائعة",
+    "cancelAnytime": "هل يمكنني الإلغاء في أي وقت؟",
+    "cancelAnswer": "نعم — يمكن إلغاء الخطط الشهرية من صفحة حسابك دون عقوبات.",
+    "teamPlans": "هل تقدمون خطط فريق أو مؤسسات؟",
+    "teamPlansAnswer": "نعم — اتصل بفريق المبيعات لدينا عبر صفحة الدعم للحصول على خطة مخصصة."
+  },
+  "support": {
+    "title": "مركز الدعم والمساعدة",
+    "subtitle": "نحن هنا للمساعدة. أرسل تذكرة أدناه أو تصفح الوثائق والأسئلة الشائعة.",
+    "contactSupport": "اتصل بالدعم",
+    "name": "الاسم",
+    "namePlaceholder": "اسمك (اختياري)",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "you@domain.com",
+    "message": "الرسالة",
+    "messagePlaceholder": "اوصف المشكلة أو الطلب",
+    "sendMessage": "إرسال الرسالة",
+    "sending": "جارٍ الإرسال...",
+    "success": "شكرًا — سنرد قريبًا.",
+    "error": "خطأ في إرسال الرسالة. يرجى المحاولة مرة أخرى.",
+    "quickResources": "موارد سريعة",
+    "documentation": "الوثائق",
+    "faq": "الأسئلة الشائعة",
+    "billingPlans": "الفوترة والخطط",
+    "officeHours": "ساعات العمل",
+    "officeHoursTime": "الاثنين–الجمعة، 09:00–18:00 UTC"
+  }
+}
